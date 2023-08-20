@@ -1,0 +1,20 @@
+enum EventType {
+  URL_CREATE_SUCCESS,
+  URL_CREATE_FAILED,
+  URL_GET_SUCCESS,
+  URL_GET_FAILED,
+}
+
+interface StatisticsEvent {
+  requestId: any;
+  eventType: EventType;
+  shortUrl: string;
+  originalUrl: string;
+  userId: string;
+  ipAddress: string;
+  userAgent: string;
+  urlCreatedAt: number;
+  eventDuration: number;
+}
+
+export { EventType, StatisticsEvent };
