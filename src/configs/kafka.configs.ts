@@ -4,6 +4,8 @@ import {
   ConsumerSubscribeTopics,
   EachMessageHandler,
   Kafka,
+  KafkaJSConnectionError,
+  KafkaJSNonRetriableError,
   logLevel,
 } from "kafkajs";
 
@@ -44,8 +46,15 @@ const initKafkaConsumer = async (
     await consumer.run({
       eachMessage: messageHandler,
     });
-  } catch (error) {
-    console.log("Error while connecting to kafka: ", error);
+  } catch (error: any) {
+    if (isKafkaConnectivityFailedError(error)) {
+      console.log(
+        `Kafka connectivity error: ${error.cause.message}, terminating application`
+      );
+      process.exit(1);
+    } else {
+      console.log("Error while connecting to kafka: ", error);
+    }
   }
 };
 
@@ -64,6 +73,13 @@ const initKafkaWithTopicAndMessageHandler = async (
 ) => {
   const consumer: Consumer = createKafkaConsumer();
   await initKafkaConsumer(consumer, topics, messageHandler);
+};
+
+const isKafkaConnectivityFailedError = (error: any): boolean => {
+  return (
+    error instanceof KafkaJSNonRetriableError &&
+    error.cause instanceof KafkaJSConnectionError
+  );
 };
 
 export { disconnectConsumer, initKafkaWithTopicAndMessageHandler };

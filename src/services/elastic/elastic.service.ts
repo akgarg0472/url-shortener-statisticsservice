@@ -1,5 +1,6 @@
 import { Client } from "@elastic/elasticsearch";
 import getElasticClient from "../../configs/elastic.configs";
+import { StatisticsEvent } from "../../model/kafka.models";
 
 let elasticClient: Client;
 let elasticIndexName: string;
@@ -51,4 +52,13 @@ const getDocuments = async (query: any) => {
   console.log(response);
 };
 
-export { getDocuments, initElasticClient };
+const pushEvent = async (event: StatisticsEvent) => {
+  const response = await elasticClient.index({
+    index: elasticIndexName,
+    body: event,
+  });
+
+  console.log(response);
+};
+
+export { getDocuments, initElasticClient, pushEvent };

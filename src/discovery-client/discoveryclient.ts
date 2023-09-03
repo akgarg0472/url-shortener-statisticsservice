@@ -22,8 +22,8 @@ const getEurekaClient = (): Eureka => {
         $: getApplicationPort(),
         "@enabled": true,
       },
-      vipAddress: "statistics-service",
-      secureVipAddress: "statistics-service",
+      vipAddress: "urlshortener-statistics-service",
+      secureVipAddress: "urlshortener-statistics-service",
       statusPageUrl: `http://localhost:${getApplicationPort()}/info`,
       dataCenterInfo: {
         name: "MyOwn",
