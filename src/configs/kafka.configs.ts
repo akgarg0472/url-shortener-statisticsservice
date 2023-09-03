@@ -33,29 +33,18 @@ const initKafkaConsumer = async (
   topics: string[],
   messageHandler: EachMessageHandler
 ) => {
-  try {
-    await consumer.connect();
+  await consumer.connect();
 
-    const topic: ConsumerSubscribeTopics = {
-      topics: topics,
-      fromBeginning: true,
-    };
+  const topic: ConsumerSubscribeTopics = {
+    topics: topics,
+    fromBeginning: true,
+  };
 
-    await consumer.subscribe(topic);
+  await consumer.subscribe(topic);
 
-    await consumer.run({
-      eachMessage: messageHandler,
-    });
-  } catch (error: any) {
-    if (isKafkaConnectivityFailedError(error)) {
-      console.log(
-        `Kafka connectivity error: ${error.cause.message}, terminating application`
-      );
-      process.exit(1);
-    } else {
-      console.log("Error while connecting to kafka: ", error);
-    }
-  }
+  await consumer.run({
+    eachMessage: messageHandler,
+  });
 };
 
 const disconnectConsumer = async (consumer: Consumer) => {

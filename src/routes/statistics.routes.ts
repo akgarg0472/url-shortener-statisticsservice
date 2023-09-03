@@ -1,68 +1,110 @@
 import express, { Request, Response } from "express";
-import validateParams from "../middleware/queryParamValidator.middleware";
+import validateQueryParams from "../middleware/queryParamValidator.middleware";
+import {
+  addDeviceMetricsRequestAttribute,
+  addGeographicalMetricsRequestAttribute,
+  addIpRequestRequestAttribute,
+  addPopularUrlRequestAttribute,
+  addRedirectStatsRequestAttribute,
+  addRedirectTimeRequestAttribute,
+  addUrlMetricsRequestAttribute,
+} from "../middleware/requestAttributeAdd.middleware";
+import {
+  DeviceMetricsRequest,
+  GeographicalMetricsRequest,
+  IpMetricsRequest,
+  PopularUrlsRequest,
+  RedirectStatisticsRequest,
+  RedirectTimeRequest,
+  UrlMetricsRequest,
+} from "../model/request.models";
+import { StatisticsResponse } from "../model/response.models";
+import {
+  getDeviceMetricsStatistics,
+  getGeographyMetricsStatistics,
+  getIpMetricsStatistics,
+  getPopularUrlsStatistics,
+  getRedirectStatsStatistics,
+  getRedirectTimeStatistics,
+  getUrlMetricsStatistics,
+} from "../services/statistics/statistics.service";
 
 const statisticsRouter = express.Router();
 
 statisticsRouter.get(
   "/popular-urls",
-  validateParams(["userId", "startTime", "endTime", "sortOrder", "limit"]),
+  validateQueryParams(["userId", "startTime", "endTime"]),
+  addPopularUrlRequestAttribute,
   (req: Request, res: Response) => {
-    const { userId, startTime, endTime, sortOrder, limit } = req.query;
-    res.json({ userId, startTime, endTime, sortOrder, limit });
+    const request: PopularUrlsRequest = (req as any).request;
+    const response: StatisticsResponse = getPopularUrlsStatistics(request);
+    res.status(response.httpCode).json(response);
   }
 );
 
 statisticsRouter.get(
   "/device-metrics",
-  validateParams(["startTime", "endTime"]),
+  validateQueryParams(["shortUrl", "startTime", "endTime"]),
+  addDeviceMetricsRequestAttribute,
   (req: Request, res: Response) => {
-    const { startTime, endTime } = req.query;
-    res.json({ startTime, endTime });
+    const request: DeviceMetricsRequest = (req as any).request;
+    const response: StatisticsResponse = getDeviceMetricsStatistics(request);
+    res.status(response.httpCode).send(response);
   }
 );
 
 statisticsRouter.get(
   "/geographical-metrics",
-  validateParams(["shortUrl", "startTime", "endTime", "locationType"]),
+  validateQueryParams(["shortUrl", "startTime", "endTime"]),
+  addGeographicalMetricsRequestAttribute,
   (req: Request, res: Response) => {
-    const { shortUrl, startTime, endTime, locationType } = req.query;
-    res.json({ shortUrl, startTime, endTime, locationType });
+    const request: GeographicalMetricsRequest = (req as any).request;
+    const response: StatisticsResponse = getGeographyMetricsStatistics(request);
+    res.status(response.httpCode).send(response);
   }
 );
 
 statisticsRouter.get(
   "/ip-metrics",
-  validateParams(["shortUrl", "startTime", "endTime"]),
+  validateQueryParams(["shortUrl", "startTime", "endTime"]),
+  addIpRequestRequestAttribute,
   (req: Request, res: Response) => {
-    const { shortUrl, startTime, endTime } = req.query;
-    res.json({ shortUrl, startTime, endTime });
+    const request: IpMetricsRequest = (req as any).request;
+    const response: StatisticsResponse = getIpMetricsStatistics(request);
+    res.status(response.httpCode).send(response);
   }
 );
 
 statisticsRouter.get(
   "/redirect-stats",
-  validateParams(["shortUrl", "startTime", "endTime", "eventType"]),
+  validateQueryParams(["shortUrl", "startTime", "endTime", "eventType"]),
+  addRedirectStatsRequestAttribute,
   (req: Request, res: Response) => {
-    const { shortUrl, startTime, endTime, eventType } = req.query;
-    res.json({ shortUrl, startTime, endTime, eventType });
+    const request: RedirectStatisticsRequest = (req as any).request;
+    const response: StatisticsResponse = getRedirectStatsStatistics(request);
+    res.status(response.httpCode).send(response);
   }
 );
 
 statisticsRouter.get(
   "/redirect-time",
-  validateParams(["shortUrl", "startTime", "endTime"]),
+  validateQueryParams(["shortUrl", "startTime", "endTime"]),
+  addRedirectTimeRequestAttribute,
   (req: Request, res: Response) => {
-    const { shortUrl, startTime, endTime } = req.query;
-    res.json({ shortUrl, startTime, endTime });
+    const request: RedirectTimeRequest = (req as any).request;
+    const response: StatisticsResponse = getRedirectTimeStatistics(request);
+    res.status(response.httpCode).send(response);
   }
 );
 
 statisticsRouter.get(
   "/url-metrics",
-  validateParams(["shortUrl", "startTime", "endTime"]),
+  validateQueryParams(["shortUrl", "startTime", "endTime"]),
+  addUrlMetricsRequestAttribute,
   (req: Request, res: Response) => {
-    const { shortUrl, startTime, endTime } = req.query;
-    res.json({ shortUrl, startTime, endTime });
+    const request: UrlMetricsRequest = (req as any).request;
+    const response: StatisticsResponse = getUrlMetricsStatistics(request);
+    res.status(response.httpCode).send(response);
   }
 );
 

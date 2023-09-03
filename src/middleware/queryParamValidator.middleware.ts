@@ -16,7 +16,7 @@ const validateQueryParams = (paramNames: string[]) => {
     if (invalidParamNames.length > 0) {
       const errorResponse: ErrorResponse =
         generateErrorResponse(invalidParamNames);
-      res.status(errorResponse.errorCode).send(errorResponse);
+      res.status(errorResponse.httpCode).json(errorResponse);
       return;
     }
 
@@ -32,7 +32,7 @@ const generateErrorResponse = (invalidParamNames: string[]): ErrorResponse => {
   }
 
   return {
-    errorCode: 400,
+    httpCode: 400,
     errors,
   };
 };
