@@ -13,8 +13,9 @@ interface StatisticsEvent {
   userId: string;
   ipAddress: string;
   userAgent: string;
-  urlCreatedAt: number;
+  createdAt: number;
   eventDuration: number;
+  timestamp: number;
 }
 
 export { EventType, StatisticsEvent };

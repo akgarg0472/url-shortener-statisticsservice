@@ -35,10 +35,12 @@ statisticsRouter.get(
   "/popular-urls",
   validateQueryParams(["userId", "startTime", "endTime"]),
   addPopularUrlRequestAttribute,
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response) => {
     const request: PopularUrlsRequest = (req as any).request;
-    const response: StatisticsResponse = getPopularUrlsStatistics(request);
-    res.status(response.httpCode).json(response);
+    const response: StatisticsResponse = await getPopularUrlsStatistics(
+      request
+    );
+    sendResponse(response, res);
   }
 );
 
@@ -49,7 +51,7 @@ statisticsRouter.get(
   (req: Request, res: Response) => {
     const request: DeviceMetricsRequest = (req as any).request;
     const response: StatisticsResponse = getDeviceMetricsStatistics(request);
-    res.status(response.httpCode).send(response);
+    sendResponse(response, res);
   }
 );
 
@@ -60,7 +62,7 @@ statisticsRouter.get(
   (req: Request, res: Response) => {
     const request: GeographicalMetricsRequest = (req as any).request;
     const response: StatisticsResponse = getGeographyMetricsStatistics(request);
-    res.status(response.httpCode).send(response);
+    sendResponse(response, res);
   }
 );
 
@@ -71,7 +73,7 @@ statisticsRouter.get(
   (req: Request, res: Response) => {
     const request: IpMetricsRequest = (req as any).request;
     const response: StatisticsResponse = getIpMetricsStatistics(request);
-    res.status(response.httpCode).send(response);
+    sendResponse(response, res);
   }
 );
 
@@ -82,7 +84,7 @@ statisticsRouter.get(
   (req: Request, res: Response) => {
     const request: RedirectStatisticsRequest = (req as any).request;
     const response: StatisticsResponse = getRedirectStatsStatistics(request);
-    res.status(response.httpCode).send(response);
+    sendResponse(response, res);
   }
 );
 
@@ -93,7 +95,7 @@ statisticsRouter.get(
   (req: Request, res: Response) => {
     const request: RedirectTimeRequest = (req as any).request;
     const response: StatisticsResponse = getRedirectTimeStatistics(request);
-    res.status(response.httpCode).send(response);
+    sendResponse(response, res);
   }
 );
 
@@ -104,8 +106,17 @@ statisticsRouter.get(
   (req: Request, res: Response) => {
     const request: UrlMetricsRequest = (req as any).request;
     const response: StatisticsResponse = getUrlMetricsStatistics(request);
-    res.status(response.httpCode).send(response);
+    sendResponse(response, res);
   }
 );
+
+const sendResponse = (response: StatisticsResponse, res: Response) => {
+  if (response.httpCode) {
+    res.status(response.httpCode);
+    delete response.httpCode;
+  }
+
+  res.json(response);
+};
 
 export default statisticsRouter;

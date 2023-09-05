@@ -1,12 +1,14 @@
 interface StatisticsResponse {
-  httpCode: number;
+  httpCode?: number;
 }
 
 interface ErrorResponse extends StatisticsResponse {
   errors: string[];
 }
 
-interface PopularUrlStatisticsResponse extends StatisticsResponse {}
+interface PopularUrlStatisticsResponse extends StatisticsResponse {
+  popularUrls: PopularUrlKey[];
+}
 
 interface DeviceMetricsResponse extends StatisticsResponse {}
 
@@ -20,11 +22,17 @@ interface RedirectTimeStatisticsResponse extends StatisticsResponse {}
 
 interface UrlStatisticsResponse extends StatisticsResponse {}
 
+interface PopularUrlKey {
+  shortUrl: string;
+  successCount: number;
+}
+
 export {
   DeviceMetricsResponse,
   ErrorResponse,
   GeographicalStatisticsResponse,
   IPStatisticsResponse,
+  PopularUrlKey,
   PopularUrlStatisticsResponse,
   RedirectStatisticsResponse,
   RedirectTimeStatisticsResponse,

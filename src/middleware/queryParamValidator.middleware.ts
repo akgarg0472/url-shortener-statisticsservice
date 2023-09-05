@@ -16,7 +16,14 @@ const validateQueryParams = (paramNames: string[]) => {
     if (invalidParamNames.length > 0) {
       const errorResponse: ErrorResponse =
         generateErrorResponse(invalidParamNames);
-      res.status(errorResponse.httpCode).json(errorResponse);
+
+      if (errorResponse.httpCode) {
+        res.status(errorResponse.httpCode);
+        delete errorResponse.httpCode;
+      }
+
+      res.json(errorResponse);
+
       return;
     }
 
@@ -28,7 +35,7 @@ const generateErrorResponse = (invalidParamNames: string[]): ErrorResponse => {
   const errors: string[] = [];
 
   for (const paramName of invalidParamNames) {
-    errors.push(`Param '${paramName}' is required`);
+    errors.push(`Parameter '${paramName}' is required`);
   }
 
   return {

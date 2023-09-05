@@ -43,13 +43,13 @@ const _createIndex = (indexName: string) => {
     });
 };
 
-const getDocuments = async (query: any) => {
+const searchDocuments = async (indexName: string, request: any) => {
   const response = await elasticClient.search({
-    index: elasticIndexName,
-    body: query,
+    index: indexName,
+    body: request,
   });
 
-  console.log(response);
+  return response;
 };
 
 const pushEvent = async (event: StatisticsEvent) => {
@@ -61,4 +61,4 @@ const pushEvent = async (event: StatisticsEvent) => {
   console.log(response);
 };
 
-export { getDocuments, initElasticClient, pushEvent };
+export { initElasticClient, pushEvent, searchDocuments };

@@ -1,3 +1,4 @@
+import { PopularUrlResponseKey } from "../../model/elastic.models";
 import {
   DeviceMetricsRequest,
   GeographicalMetricsRequest,
@@ -9,25 +10,65 @@ import {
 } from "../../model/request.models";
 import {
   DeviceMetricsResponse,
+  ErrorResponse,
   GeographicalStatisticsResponse,
   IPStatisticsResponse,
+  PopularUrlKey,
   PopularUrlStatisticsResponse,
   RedirectStatisticsResponse,
   RedirectTimeStatisticsResponse,
   StatisticsResponse,
   UrlStatisticsResponse,
 } from "../../model/response.models";
+import { searchDocuments } from "../elastic/elastic.service";
+import { buildPopularUrlQuery } from "./queryBuilder.service";
 
-const getPopularUrlsStatistics = (
+const getPopularUrlsStatistics = async (
   request: PopularUrlsRequest
-): StatisticsResponse => {
-  console.log(request);
+): Promise<StatisticsResponse> => {
+  try {
+    const popularUrlQuery = buildPopularUrlQuery(
+      request.userId,
+      request.startTime,
+      request.endTime,
+      request.limit,
+      request.sortOrder
+    );
 
-  const response: PopularUrlStatisticsResponse = {
-    httpCode: 200,
-  };
+    const searchResponse = await searchDocuments(
+      "urlshortener-fetch",
+      popularUrlQuery
+    );
 
-  return response;
+    const topUrlsAggregation: PopularUrlResponseKey[] = (
+      searchResponse.aggregations?.top_popular_urls as any
+    ).buckets;
+
+    const urls: PopularUrlKey[] = [];
+
+    if (topUrlsAggregation && topUrlsAggregation.length > 0) {
+      for (const popularUrl of topUrlsAggregation) {
+        const url: PopularUrlKey = {
+          shortUrl: popularUrl.key,
+          successCount: popularUrl.success_count.doc_count,
+        };
+        urls.push(url);
+      }
+    }
+
+    const popularUrlResponse: PopularUrlStatisticsResponse = {
+      popularUrls: urls,
+    };
+
+    return Promise.resolve(popularUrlResponse);
+  } catch (error: any) {
+    const errorResponse: ErrorResponse = {
+      httpCode: 500,
+      errors: ["Internal Server Error"],
+    };
+
+    return errorResponse;
+  }
 };
 
 const getDeviceMetricsStatistics = (

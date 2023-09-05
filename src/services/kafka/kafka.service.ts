@@ -19,7 +19,10 @@ const onMessage = (message: KafkaMessage) => {
     return;
   }
 
-  const statisticsEvent: StatisticsEvent = { ...JSON.parse(messageString) };
+  const statisticsEvent: StatisticsEvent = {
+    ...JSON.parse(messageString),
+    timestamp: new Date().getTime(),
+  };
 
   console.log("Statistics event received:", statisticsEvent);
 };
