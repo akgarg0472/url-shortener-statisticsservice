@@ -53,4 +53,55 @@ const buildPopularUrlQuery = (
   return searchRequest;
 };
 
-export { buildPopularUrlQuery };
+const buildDeviceMetricsQuery = (
+  userId: string,
+  shortUrl: string,
+  startTime: number,
+  endTime: number
+) => {
+  return {
+    size: 0,
+    query: {
+      bool: {
+        must: [
+          {
+            match: {
+              userId: userId,
+            },
+          },
+          {
+            match: {
+              shortUrl: shortUrl,
+            },
+          },
+          {
+            range: {
+              timestamp: {
+                gte: startTime,
+                lte: endTime,
+              },
+            },
+          },
+        ],
+      },
+    },
+    aggs: {
+      os_browsers: {
+        terms: {
+          field: "deviceInfo.os.keyword",
+          size: 2147483647,
+        },
+        aggs: {
+          os_browsers: {
+            terms: {
+              field: "deviceInfo.browser.keyword",
+              size: 2147483647,
+            },
+          },
+        },
+      },
+    },
+  };
+};
+
+export { buildDeviceMetricsQuery, buildPopularUrlQuery };

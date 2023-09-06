@@ -1,47 +1,39 @@
-interface PopularUrlsRequest {
-  userId: string;
+interface _StatisticsRequest {
   startTime: number;
   endTime: number;
+}
+
+interface PopularUrlsRequest extends _StatisticsRequest {
+  userId: string;
   sortOrder: string;
   limit: number;
 }
 
-interface DeviceMetricsRequest {
+interface DeviceMetricsRequest extends _StatisticsRequest {
+  userId: string;
   shortUrl: string;
-  startTime: number;
-  endTime: number;
 }
 
-interface GeographicalMetricsRequest {
+interface GeographicalMetricsRequest extends _StatisticsRequest {
   shortUrl: string;
-  startTime: number;
-  endTime: number;
 }
 
-interface IpMetricsRequest {
+interface IpMetricsRequest extends _StatisticsRequest {
   shortUrl: string;
-  startTime: number;
-  endTime: number;
 }
 
-interface RedirectStatisticsRequest {
+interface RedirectStatisticsRequest extends _StatisticsRequest {
   shortUrl: string;
-  startTime: number;
-  endTime: number;
   eventType: string;
 }
 
-interface RedirectTimeRequest {
+interface RedirectTimeRequest extends _StatisticsRequest {
   shortUrl: string;
-  startTime: number;
-  endTime: number;
   eventType: string;
 }
 
-interface UrlMetricsRequest {
+interface UrlMetricsRequest extends _StatisticsRequest {
   shortUrl: string;
-  startTime: number;
-  endTime: number;
 }
 
 export {

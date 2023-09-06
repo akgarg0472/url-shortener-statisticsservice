@@ -10,7 +10,9 @@ interface PopularUrlStatisticsResponse extends StatisticsResponse {
   popularUrls: PopularUrlKey[];
 }
 
-interface DeviceMetricsResponse extends StatisticsResponse {}
+interface DeviceMetricsResponse extends StatisticsResponse {
+  osBrowsers: OsBrowserKey[];
+}
 
 interface GeographicalStatisticsResponse extends StatisticsResponse {}
 
@@ -27,11 +29,24 @@ interface PopularUrlKey {
   successCount: number;
 }
 
+interface BrowserKey {
+  name: string;
+  count: number;
+}
+
+interface OsBrowserKey {
+  osName: string;
+  count: number;
+  browsers: BrowserKey[];
+}
+
 export {
+  BrowserKey,
   DeviceMetricsResponse,
   ErrorResponse,
   GeographicalStatisticsResponse,
   IPStatisticsResponse,
+  OsBrowserKey,
   PopularUrlKey,
   PopularUrlStatisticsResponse,
   RedirectStatisticsResponse,

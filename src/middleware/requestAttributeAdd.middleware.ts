@@ -33,9 +33,10 @@ const addDeviceMetricsRequestAttribute = (
   res: Response,
   next: NextFunction
 ) => {
-  const { shortUrl, startTime, endTime } = req.query;
+  const { shortUrl, userId, startTime, endTime } = req.query;
 
   const deviceMetricsRequest: DeviceMetricsRequest = {
+    userId: userId?.toString()!,
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),

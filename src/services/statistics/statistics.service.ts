@@ -1,4 +1,7 @@
-import { PopularUrlResponseKey } from "../../model/elastic.models";
+import {
+  DeviceMetricResponseKey,
+  PopularUrlResponseKey,
+} from "../../model/elastic.models";
 import {
   DeviceMetricsRequest,
   GeographicalMetricsRequest,
@@ -9,10 +12,12 @@ import {
   UrlMetricsRequest,
 } from "../../model/request.models";
 import {
+  BrowserKey,
   DeviceMetricsResponse,
   ErrorResponse,
   GeographicalStatisticsResponse,
   IPStatisticsResponse,
+  OsBrowserKey,
   PopularUrlKey,
   PopularUrlStatisticsResponse,
   RedirectStatisticsResponse,
@@ -21,7 +26,10 @@ import {
   UrlStatisticsResponse,
 } from "../../model/response.models";
 import { searchDocuments } from "../elastic/elastic.service";
-import { buildPopularUrlQuery } from "./queryBuilder.service";
+import {
+  buildDeviceMetricsQuery,
+  buildPopularUrlQuery,
+} from "./queryBuilder.service";
 
 const getPopularUrlsStatistics = async (
   request: PopularUrlsRequest
@@ -71,16 +79,60 @@ const getPopularUrlsStatistics = async (
   }
 };
 
-const getDeviceMetricsStatistics = (
+const getDeviceMetricsStatistics = async (
   request: DeviceMetricsRequest
-): StatisticsResponse => {
-  console.log(request);
+): Promise<StatisticsResponse> => {
+  try {
+    const deviceMetricsQuery = buildDeviceMetricsQuery(
+      request.userId,
+      request.shortUrl,
+      request.startTime,
+      request.endTime
+    );
 
-  const response: DeviceMetricsResponse = {
-    httpCode: 200,
-  };
+    const searchResponse = await searchDocuments(
+      "urlshortener-fetch",
+      deviceMetricsQuery
+    );
 
-  return response;
+    const deviceMetricsAggregation: DeviceMetricResponseKey[] = (
+      searchResponse.aggregations?.os_browsers as any
+    ).buckets;
+
+    const osBrowsers: OsBrowserKey[] = [];
+
+    if (deviceMetricsAggregation.length > 0) {
+      for (const deviceInfo of deviceMetricsAggregation) {
+        const osBrowser: OsBrowserKey = {
+          osName: deviceInfo.key,
+          count: deviceInfo.doc_count,
+          browsers: deviceInfo.os_browsers.buckets.map((browser) => {
+            const _browser: BrowserKey = {
+              name: browser.key,
+              count: browser.doc_count,
+            };
+
+            return _browser;
+          }),
+        };
+        osBrowsers.push(osBrowser);
+      }
+    }
+
+    const response: DeviceMetricsResponse = {
+      httpCode: 200,
+      osBrowsers,
+    };
+
+    return Promise.resolve(response);
+  } catch (error) {
+    const errorResponse: ErrorResponse = {
+      httpCode: 500,
+      errors: ["Internal Server Error"],
+    };
+
+    return errorResponse;
+  }
 };
 
 const getGeographyMetricsStatistics = (

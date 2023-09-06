@@ -46,11 +46,13 @@ statisticsRouter.get(
 
 statisticsRouter.get(
   "/device-metrics",
-  validateQueryParams(["shortUrl", "startTime", "endTime"]),
+  validateQueryParams(["shortUrl", "userId", "startTime", "endTime"]),
   addDeviceMetricsRequestAttribute,
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response) => {
     const request: DeviceMetricsRequest = (req as any).request;
-    const response: StatisticsResponse = getDeviceMetricsStatistics(request);
+    const response: StatisticsResponse = await getDeviceMetricsStatistics(
+      request
+    );
     sendResponse(response, res);
   }
 );
