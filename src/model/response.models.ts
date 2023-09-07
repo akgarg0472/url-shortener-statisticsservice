@@ -29,6 +29,13 @@ interface RedirectTimeStatisticsResponse extends StatisticsResponse {}
 
 interface UrlStatisticsResponse extends StatisticsResponse {}
 
+interface DashboardResponse extends StatisticsResponse {
+  total_hits: number;
+  avg_redirect_duration: number;
+  countries: CountryKey[];
+  continents: ContinentKey[];
+}
+
 interface PopularUrlKey {
   short_url: string;
   hits_count: number;
@@ -58,13 +65,13 @@ interface CityKey {
 interface CountryKey {
   name: string;
   hits_count: number;
-  cities: CityKey[];
+  cities?: CityKey[];
 }
 
 interface ContinentKey {
   name: string;
   hits_count: number;
-  countries: CountryKey[];
+  countries?: CountryKey[];
 }
 
 export {
@@ -72,6 +79,7 @@ export {
   CityKey,
   ContinentKey,
   CountryKey,
+  DashboardResponse,
   DeviceMetricsResponse,
   ErrorResponse,
   GeographicalStatisticsResponse,

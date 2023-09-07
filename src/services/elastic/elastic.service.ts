@@ -1,4 +1,8 @@
 import { Client } from "@elastic/elasticsearch";
+import {
+  AggregationsAggregate,
+  SearchResponse,
+} from "@elastic/elasticsearch/lib/api/types";
 import getElasticClient from "../../configs/elastic.configs";
 import { StatisticsEvent } from "../../model/kafka.models";
 
@@ -43,8 +47,14 @@ const _createIndex = (indexName: string) => {
     });
 };
 
-const searchDocuments = async (indexName: string, request: any) => {
-  const response = await elasticClient.search({
+const searchDocuments = async (
+  indexName: string,
+  request: any
+): Promise<SearchResponse<unknown, Record<string, AggregationsAggregate>>> => {
+  const response: SearchResponse<
+    unknown,
+    Record<string, AggregationsAggregate>
+  > = await elasticClient.search({
     index: indexName,
     body: request,
   });

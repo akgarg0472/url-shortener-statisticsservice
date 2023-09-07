@@ -1,9 +1,6 @@
 interface PopularUrlResponseKey {
   key: string;
   doc_count: number;
-  success_count: {
-    doc_count: number;
-  };
 }
 
 interface Browser {
@@ -33,7 +30,7 @@ interface GeoCityKey {
 interface GeoCountry {
   key: string;
   doc_count: number;
-  cities: GeoCityKey;
+  cities?: GeoCityKey;
 }
 
 interface GeoCountryKey {
@@ -43,7 +40,12 @@ interface GeoCountryKey {
 interface GeoContinentAgg {
   key: string;
   doc_count: number;
-  countries: GeoCountryKey;
+  countries?: GeoCountryKey;
 }
 
-export { DeviceMetricResponseKey, GeoContinentAgg, PopularUrlResponseKey };
+export {
+  DeviceMetricResponseKey,
+  GeoContinentAgg,
+  GeoCountry,
+  PopularUrlResponseKey,
+};

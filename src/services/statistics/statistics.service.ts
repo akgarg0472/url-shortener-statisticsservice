@@ -1,36 +1,89 @@
-import {
-  DeviceMetricResponseKey,
-  GeoContinentAgg,
-  PopularUrlResponseKey,
-} from "../../model/elastic.models";
-import {
-  DeviceMetricsRequest,
-  GeographicalMetricsRequest,
-  PopularUrlsRequest,
-  RedirectStatisticsRequest,
-  RedirectTimeRequest,
-  UrlMetricsRequest,
-} from "../../model/request.models";
+import * as EM from "../../model/elastic.models";
+import * as RequestModels from "../../model/request.models";
 import * as RM from "../../model/response.models";
 import { searchDocuments } from "../elastic/elastic.service";
-import {
-  buildDeviceMetricsQuery,
-  buildGeographicalQuery,
-  buildPopularUrlQuery,
-} from "./queryBuilder.service";
+import * as QueryBuilder from "./queryBuilder.service";
 
-const getPopularUrlsStatistics = async (
-  request: PopularUrlsRequest
+const elasticIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
+
+const getSummaryStatistics = async (
+  request: RequestModels.SummaryRequest
 ): Promise<RM.StatisticsResponse> => {
   try {
-    const popularUrlQuery = buildPopularUrlQuery(request);
+    const dashboardQuery = QueryBuilder.buildSummaryQuery(request);
 
     const searchResponse = await searchDocuments(
-      "urlshortener-fetch",
+      elasticIndexName!,
+      dashboardQuery
+    );
+
+    const totalHits: number = (searchResponse.aggregations?.total_hits as any)
+      .value;
+
+    const averageRedirectDuration: number = parseFloat(
+      (
+        (searchResponse.aggregations?.avg_redirect_duration as any)
+          .value as number
+      ).toFixed(2)
+    );
+
+    const continentAgg: EM.GeoContinentAgg[] = (
+      searchResponse.aggregations?.continents as any
+    ).buckets;
+
+    const countriesAgg: EM.GeoCountry[] = (
+      searchResponse.aggregations?.countries as any
+    ).buckets;
+
+    const __continents: RM.ContinentKey[] = continentAgg.map((continent) => {
+      const _continent: RM.ContinentKey = {
+        name: continent.key,
+        hits_count: continent.doc_count,
+      };
+      return _continent;
+    });
+
+    const __countries: RM.CountryKey[] = countriesAgg.map((country) => {
+      const _country: RM.CountryKey = {
+        name: country.key,
+        hits_count: country.doc_count,
+      };
+
+      return _country;
+    });
+
+    const response: RM.DashboardResponse = {
+      http_code: 200,
+      total_hits: totalHits,
+      avg_redirect_duration: averageRedirectDuration,
+      continents: __continents.slice(0, 5),
+      countries: __countries.slice(0, 5),
+    };
+    return response;
+  } catch (error) {
+    console.log(error);
+
+    const errorResponse: RM.ErrorResponse = {
+      http_code: 500,
+      errors: ["Internal Server Error"],
+    };
+
+    return errorResponse;
+  }
+};
+
+const getPopularUrlsStatistics = async (
+  request: RequestModels.PopularUrlsRequest
+): Promise<RM.StatisticsResponse> => {
+  try {
+    const popularUrlQuery = QueryBuilder.buildPopularUrlQuery(request);
+
+    const searchResponse = await searchDocuments(
+      elasticIndexName!,
       popularUrlQuery
     );
 
-    const topUrlsAggregation: PopularUrlResponseKey[] = (
+    const topUrlsAggregation: EM.PopularUrlResponseKey[] = (
       searchResponse.aggregations?.top_popular_urls as any
     ).buckets;
 
@@ -40,7 +93,7 @@ const getPopularUrlsStatistics = async (
       for (const popularUrl of topUrlsAggregation) {
         const url: RM.PopularUrlKey = {
           short_url: popularUrl.key,
-          hits_count: popularUrl.success_count.doc_count,
+          hits_count: popularUrl.doc_count,
         };
         urls.push(url);
       }
@@ -52,6 +105,8 @@ const getPopularUrlsStatistics = async (
 
     return Promise.resolve(popularUrlResponse);
   } catch (error: any) {
+    console.log(error);
+
     const errorResponse: RM.ErrorResponse = {
       http_code: 500,
       errors: ["Internal Server Error"],
@@ -61,18 +116,44 @@ const getPopularUrlsStatistics = async (
   }
 };
 
+const getUrlStatistics = async (
+  request: RequestModels.UrlMetricsRequest
+): Promise<RM.StatisticsResponse> => {
+  const urlStatsQuery = QueryBuilder.buildUrlStatsQuery(request);
+
+  const searchResponse = await searchDocuments(
+    elasticIndexName!,
+    urlStatsQuery
+  );
+
+  const totalHitsCount = (searchResponse.aggregations?.total_hits_count as any)
+    .value;
+
+  const averageEventsDuration = parseFloat(
+    (
+      (searchResponse.aggregations?.avg_event_duration as any).value as number
+    ).toFixed(2)
+  );
+
+  console.log(searchResponse);
+
+  return {
+    http_code: 200,
+  };
+};
+
 const getDeviceMetricsStatistics = async (
-  request: DeviceMetricsRequest
+  request: RequestModels.DeviceMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
   try {
-    const deviceMetricsQuery = buildDeviceMetricsQuery(request);
+    const deviceMetricsQuery = QueryBuilder.buildDeviceMetricsQuery(request);
 
     const searchResponse = await searchDocuments(
-      "urlshortener-fetch",
+      elasticIndexName!,
       deviceMetricsQuery
     );
 
-    const deviceMetricsAggregation: DeviceMetricResponseKey[] = (
+    const deviceMetricsAggregation: EM.DeviceMetricResponseKey[] = (
       searchResponse.aggregations?.os_browsers as any
     ).buckets;
 
@@ -141,17 +222,17 @@ const getDeviceMetricsStatistics = async (
 };
 
 const getGeographyMetricsStatistics = async (
-  request: GeographicalMetricsRequest
+  request: RequestModels.GeographicalMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
   try {
-    const geographicaQuery = buildGeographicalQuery(request);
+    const geographicaQuery = QueryBuilder.buildGeographicalQuery(request);
 
     const searchResponse = await searchDocuments(
-      "urlshortener-fetch",
+      elasticIndexName!,
       geographicaQuery
     );
 
-    const geographyContinentsAggr: GeoContinentAgg[] = (
+    const geographyContinentsAggr: EM.GeoContinentAgg[] = (
       searchResponse.aggregations?.continents as any
     ).buckets;
 
@@ -160,11 +241,11 @@ const getGeographyMetricsStatistics = async (
 
     if (geographyContinentsAggr.length > 0) {
       for (const continent of geographyContinentsAggr) {
-        const countries = continent.countries.buckets;
+        const countries = continent.countries!.buckets;
         const _countries: RM.CountryKey[] = [];
 
         for (const country of countries) {
-          const cities = country.cities.buckets;
+          const cities = country.cities!.buckets;
           const _cities: RM.CityKey[] = [];
 
           for (const city of cities) {
@@ -194,6 +275,9 @@ const getGeographyMetricsStatistics = async (
       }
     }
 
+    __continents.sort((c1, c2) => c1.hits_count - c2.hits_count);
+    __countries.sort((c1, c2) => c1.hits_count - c2.hits_count);
+
     const response: RM.GeographicalStatisticsResponse = {
       http_code: 200,
       continents: __continents,
@@ -213,47 +297,10 @@ const getGeographyMetricsStatistics = async (
   }
 };
 
-const getRedirectStatsStatistics = (
-  request: RedirectStatisticsRequest
-): RM.StatisticsResponse => {
-  console.log(request);
-
-  const response: RM.RedirectStatisticsResponse = {
-    http_code: 200,
-  };
-
-  return response;
-};
-
-const getRedirectTimeStatistics = (
-  request: RedirectTimeRequest
-): RM.StatisticsResponse => {
-  console.log(request);
-
-  const response: RM.RedirectTimeStatisticsResponse = {
-    http_code: 200,
-  };
-
-  return response;
-};
-
-const getUrlMetricsStatistics = (
-  request: UrlMetricsRequest
-): RM.StatisticsResponse => {
-  console.log(request);
-
-  const response: RM.UrlStatisticsResponse = {
-    http_code: 200,
-  };
-
-  return response;
-};
-
 export {
   getDeviceMetricsStatistics,
   getGeographyMetricsStatistics,
   getPopularUrlsStatistics,
-  getRedirectStatsStatistics,
-  getRedirectTimeStatistics,
-  getUrlMetricsStatistics,
+  getSummaryStatistics,
+  getUrlStatistics,
 };

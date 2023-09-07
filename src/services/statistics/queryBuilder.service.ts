@@ -1,11 +1,55 @@
-import { EventType } from "../../model/kafka.models";
-import {
-  DeviceMetricsRequest,
-  GeographicalMetricsRequest,
-  PopularUrlsRequest,
-} from "../../model/request.models";
+import * as RequestModels from "../../model/request.models";
 
-const buildPopularUrlQuery = (request: PopularUrlsRequest) => {
+const buildSummaryQuery = (request: RequestModels.SummaryRequest) => {
+  return {
+    size: 0,
+    query: {
+      bool: {
+        must: [
+          {
+            term: {
+              "userId.keyword": request.userId,
+            },
+          },
+          {
+            range: {
+              timestamp: {
+                gte: request.startTime,
+                lte: request.endTime,
+              },
+            },
+          },
+        ],
+      },
+    },
+    aggs: {
+      total_hits: {
+        value_count: {
+          field: "requestId.keyword",
+        },
+      },
+      avg_redirect_duration: {
+        avg: {
+          field: "eventDuration",
+        },
+      },
+      continents: {
+        terms: {
+          field: "geoLocation.continent.keyword",
+          size: 2147483647,
+        },
+      },
+      countries: {
+        terms: {
+          field: "geoLocation.country.keyword",
+          size: 2147483647,
+        },
+      },
+    },
+  };
+};
+
+const buildPopularUrlQuery = (request: RequestModels.PopularUrlsRequest) => {
   const searchRequest = {
     size: 0,
     query: {
@@ -31,18 +75,9 @@ const buildPopularUrlQuery = (request: PopularUrlsRequest) => {
       top_popular_urls: {
         terms: {
           field: "shortUrl.keyword",
-          size: request.limit <= 10 ? request.limit : 10,
+          size: request.limit,
           order: {
             _count: request.sortOrder,
-          },
-        },
-        aggs: {
-          success_count: {
-            filter: {
-              term: {
-                "eventType.keyword": EventType.URL_GET_SUCCESS.toString(),
-              },
-            },
           },
         },
       },
@@ -52,7 +87,9 @@ const buildPopularUrlQuery = (request: PopularUrlsRequest) => {
   return searchRequest;
 };
 
-const buildDeviceMetricsQuery = (request: DeviceMetricsRequest) => {
+const buildDeviceMetricsQuery = (
+  request: RequestModels.DeviceMetricsRequest
+) => {
   return {
     size: 0,
     query: {
@@ -98,7 +135,9 @@ const buildDeviceMetricsQuery = (request: DeviceMetricsRequest) => {
   };
 };
 
-const buildGeographicalQuery = (request: GeographicalMetricsRequest) => {
+const buildGeographicalQuery = (
+  request: RequestModels.GeographicalMetricsRequest
+) => {
   return {
     size: 0,
     query: {
@@ -129,16 +168,19 @@ const buildGeographicalQuery = (request: GeographicalMetricsRequest) => {
       continents: {
         terms: {
           field: "geoLocation.continent.keyword",
+          size: 2147483647,
         },
         aggs: {
           countries: {
             terms: {
               field: "geoLocation.country.keyword",
+              size: 2147483647,
             },
             aggs: {
               cities: {
                 terms: {
                   field: "geoLocation.city.keyword",
+                  size: 2147483647,
                 },
               },
             },
@@ -149,8 +191,58 @@ const buildGeographicalQuery = (request: GeographicalMetricsRequest) => {
   };
 };
 
+const buildUrlStatsQuery = (request: RequestModels.UrlMetricsRequest) => {
+  return {
+    size: 0,
+    query: {
+      bool: {
+        must: [
+          {
+            term: {
+              "shortUrl.keyword": request.shortUrl,
+            },
+          },
+          {
+            term: {
+              "userId.keyword": request.userId,
+            },
+          },
+          {
+            range: {
+              timestamp: {
+                gte: request.startTime,
+                lte: request.endTime,
+              },
+            },
+          },
+        ],
+      },
+    },
+    aggs: {
+      total_hits_count: {
+        value_count: {
+          field: "requestId.keyword",
+        },
+      },
+      avg_event_duration: {
+        avg: {
+          field: "eventDuration",
+        },
+      },
+      latest_hits: {
+        top_hits: {
+          size: request.limit,
+          sort: [{ timestamp: "desc" }],
+        },
+      },
+    },
+  };
+};
+
 export {
   buildDeviceMetricsQuery,
   buildGeographicalQuery,
   buildPopularUrlQuery,
+  buildSummaryQuery,
+  buildUrlStatsQuery,
 };

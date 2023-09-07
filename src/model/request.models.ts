@@ -33,7 +33,10 @@ interface RedirectTimeRequest extends _StatisticsRequest {
 
 interface UrlMetricsRequest extends _StatisticsRequest {
   shortUrl: string;
+  limit: number;
 }
+
+interface SummaryRequest extends _StatisticsRequest {}
 
 export {
   DeviceMetricsRequest,
@@ -42,5 +45,6 @@ export {
   PopularUrlsRequest,
   RedirectStatisticsRequest,
   RedirectTimeRequest,
+  SummaryRequest,
   UrlMetricsRequest,
 };
