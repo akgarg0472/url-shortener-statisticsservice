@@ -52,9 +52,10 @@ const addGeographicalMetricsRequestAttribute = (
   res: Response,
   next: NextFunction
 ) => {
-  const { shortUrl, startTime, endTime } = req.query;
+  const { userId, shortUrl, startTime, endTime } = req.query;
 
   const deviceMetricsRequest: GeographicalMetricsRequest = {
+    userId: userId?.toString()!,
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
@@ -70,9 +71,10 @@ const addIpRequestRequestAttribute = (
   res: Response,
   next: NextFunction
 ) => {
-  const { shortUrl, startTime, endTime } = req.query;
+  const { userId, shortUrl, startTime, endTime } = req.query;
 
   const deviceMetricsRequest: GeographicalMetricsRequest = {
+    userId: userId?.toString()!,
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
@@ -88,9 +90,10 @@ const addRedirectStatsRequestAttribute = (
   res: Response,
   next: NextFunction
 ) => {
-  const { shortUrl, startTime, endTime, eventType } = req.query;
+  const { userId, shortUrl, startTime, endTime, eventType } = req.query;
 
   const redirectStatisticsRequest: RedirectStatisticsRequest = {
+    userId: userId?.toString()!,
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
@@ -107,9 +110,10 @@ const addRedirectTimeRequestAttribute = (
   res: Response,
   next: NextFunction
 ) => {
-  const { shortUrl, startTime, endTime, eventType } = req.query;
+  const { userId, shortUrl, startTime, endTime, eventType } = req.query;
 
   const redirectTimeRequest: RedirectTimeRequest = {
+    userId: userId?.toString()!,
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
@@ -126,9 +130,10 @@ const addUrlMetricsRequestAttribute = (
   res: Response,
   next: NextFunction
 ) => {
-  const { shortUrl, startTime, endTime } = req.query;
+  const { userId, shortUrl, startTime, endTime } = req.query;
 
   const urlMetricsRequest: UrlMetricsRequest = {
+    userId: userId?.toString()!,
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),

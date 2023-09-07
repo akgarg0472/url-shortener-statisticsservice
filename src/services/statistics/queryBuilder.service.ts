@@ -1,12 +1,11 @@
 import { EventType } from "../../model/kafka.models";
+import {
+  DeviceMetricsRequest,
+  GeographicalMetricsRequest,
+  PopularUrlsRequest,
+} from "../../model/request.models";
 
-const buildPopularUrlQuery = (
-  userId: string,
-  startTime: number,
-  endTime: number,
-  limit: number,
-  sortOrder: string
-) => {
+const buildPopularUrlQuery = (request: PopularUrlsRequest) => {
   const searchRequest = {
     size: 0,
     query: {
@@ -14,14 +13,14 @@ const buildPopularUrlQuery = (
         must: [
           {
             term: {
-              "userId.keyword": userId,
+              "userId.keyword": request.userId,
             },
           },
           {
             range: {
               timestamp: {
-                gte: startTime,
-                lte: endTime,
+                gte: request.startTime,
+                lte: request.endTime,
               },
             },
           },
@@ -32,9 +31,9 @@ const buildPopularUrlQuery = (
       top_popular_urls: {
         terms: {
           field: "shortUrl.keyword",
-          size: limit,
+          size: request.limit <= 10 ? request.limit : 10,
           order: {
-            _count: sortOrder,
+            _count: request.sortOrder,
           },
         },
         aggs: {
@@ -53,12 +52,7 @@ const buildPopularUrlQuery = (
   return searchRequest;
 };
 
-const buildDeviceMetricsQuery = (
-  userId: string,
-  shortUrl: string,
-  startTime: number,
-  endTime: number
-) => {
+const buildDeviceMetricsQuery = (request: DeviceMetricsRequest) => {
   return {
     size: 0,
     query: {
@@ -66,19 +60,19 @@ const buildDeviceMetricsQuery = (
         must: [
           {
             match: {
-              userId: userId,
+              userId: request.userId,
             },
           },
           {
             match: {
-              shortUrl: shortUrl,
+              shortUrl: request.shortUrl,
             },
           },
           {
             range: {
               timestamp: {
-                gte: startTime,
-                lte: endTime,
+                gte: request.startTime,
+                lte: request.endTime,
               },
             },
           },
@@ -104,4 +98,59 @@ const buildDeviceMetricsQuery = (
   };
 };
 
-export { buildDeviceMetricsQuery, buildPopularUrlQuery };
+const buildGeographicalQuery = (request: GeographicalMetricsRequest) => {
+  return {
+    size: 0,
+    query: {
+      bool: {
+        must: [
+          {
+            match: {
+              userId: request.userId,
+            },
+          },
+          {
+            match: {
+              shortUrl: request.shortUrl,
+            },
+          },
+          {
+            range: {
+              timestamp: {
+                gte: request.startTime,
+                lte: request.endTime,
+              },
+            },
+          },
+        ],
+      },
+    },
+    aggs: {
+      continents: {
+        terms: {
+          field: "geoLocation.continent.keyword",
+        },
+        aggs: {
+          countries: {
+            terms: {
+              field: "geoLocation.country.keyword",
+            },
+            aggs: {
+              cities: {
+                terms: {
+                  field: "geoLocation.city.keyword",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+};
+
+export {
+  buildDeviceMetricsQuery,
+  buildGeographicalQuery,
+  buildPopularUrlQuery,
+};

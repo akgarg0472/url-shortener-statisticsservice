@@ -21,4 +21,29 @@ interface DeviceMetricResponseKey {
   os_browsers: OSBrowser;
 }
 
-export { DeviceMetricResponseKey, PopularUrlResponseKey };
+interface GeoCity {
+  key: string;
+  doc_count: number;
+}
+
+interface GeoCityKey {
+  buckets: GeoCity[];
+}
+
+interface GeoCountry {
+  key: string;
+  doc_count: number;
+  cities: GeoCityKey;
+}
+
+interface GeoCountryKey {
+  buckets: GeoCountry[];
+}
+
+interface GeoContinentAgg {
+  key: string;
+  doc_count: number;
+  countries: GeoCountryKey;
+}
+
+export { DeviceMetricResponseKey, GeoContinentAgg, PopularUrlResponseKey };

@@ -1,16 +1,15 @@
 interface _StatisticsRequest {
   startTime: number;
   endTime: number;
+  userId: string;
 }
 
 interface PopularUrlsRequest extends _StatisticsRequest {
-  userId: string;
   sortOrder: string;
   limit: number;
 }
 
 interface DeviceMetricsRequest extends _StatisticsRequest {
-  userId: string;
   shortUrl: string;
 }
 
