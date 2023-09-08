@@ -125,12 +125,14 @@ const addUrlMetricsRequestAttribute = (
 ) => {
   const { userId, shortUrl, startTime, endTime, limit } = req.query;
 
+  const __limit: number = parseInt(limit?.toString()!);
+
   const urlMetricsRequest: RequestModels.UrlMetricsRequest = {
     userId: userId?.toString()!,
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
-    limit: parseInt(limit?.toString()!),
+    limit: __limit <= 10 ? __limit : 10,
   };
 
   (req as any).request = urlMetricsRequest;

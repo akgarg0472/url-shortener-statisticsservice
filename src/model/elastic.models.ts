@@ -59,11 +59,33 @@ interface EURL {
   };
 }
 
+interface LatestHitsResp {
+  _source: {
+    ipAddress: string;
+    eventDuration: number;
+    geoLocation: {
+      continent: string;
+      country: string;
+      city: string;
+      lat: number;
+      lon: number;
+      timezone: string;
+    };
+    timestamp: number;
+    deviceInfo: { browser: string; os: string };
+  };
+}
+
+interface LatestHitsAggResp {
+  hits: LatestHitsResp[];
+}
+
 export {
   DeviceMetricResponseKey,
   EURL,
   GeneratedUrlResp,
   GeoContinentAgg,
   GeoCountry,
+  LatestHitsAggResp,
   PopularUrlResponseKey,
 };

@@ -105,8 +105,6 @@ const getGeneratedShortUrls = async (
 
     return response;
   } catch (error) {
-    console.log(error);
-
     const errorResponse: RM.ErrorResponse = {
       http_code: 500,
       errors: ["Internal Server Error"],
@@ -150,8 +148,6 @@ const getPopularUrlsStatistics = async (
 
     return Promise.resolve(popularUrlResponse);
   } catch (error: any) {
-    console.log(error);
-
     const errorResponse: RM.ErrorResponse = {
       http_code: 500,
       errors: ["Internal Server Error"],
@@ -164,28 +160,62 @@ const getPopularUrlsStatistics = async (
 const getUrlStatistics = async (
   request: RequestModels.UrlMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
-  const urlStatsQuery = QueryBuilder.buildUrlStatsQuery(request);
-  const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
+  try {
+    const urlStatsQuery = QueryBuilder.buildUrlStatsQuery(request);
+    const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
 
-  const searchResponse = await searchDocuments(
-    elasticStatsIndexName!,
-    urlStatsQuery
-  );
+    const searchResponse = await searchDocuments(
+      elasticStatsIndexName!,
+      urlStatsQuery
+    );
 
-  const totalHitsCount = (searchResponse.aggregations?.total_hits_count as any)
-    .value;
+    const totalHitsCount = (
+      searchResponse.aggregations?.total_hits_count as any
+    ).value;
 
-  const averageEventsDuration = parseFloat(
-    (
-      (searchResponse.aggregations?.avg_event_duration as any).value as number
-    ).toFixed(2)
-  );
+    const averageRedirectDuration = parseFloat(
+      (
+        (searchResponse.aggregations?.avg_event_duration as any).value as number
+      ).toFixed(2)
+    );
 
-  console.log(searchResponse);
+    const latestHits: EM.LatestHitsAggResp = (
+      searchResponse.aggregations?.latest_hits as any
+    ).hits;
 
-  return {
-    http_code: 200,
-  };
+    const __latestHits: RM.LatestHit[] = [];
+
+    latestHits.hits.forEach((hit) => {
+      const _latest_hit: RM.LatestHit = {
+        ip: hit._source.ipAddress,
+        device_info: hit._source.deviceInfo,
+        redirect_duration: hit._source.eventDuration,
+        timestamp: hit._source.timestamp,
+        location: {
+          country: hit._source.geoLocation.country,
+          timezone: hit._source.geoLocation.timezone,
+        },
+      };
+
+      __latestHits.push(_latest_hit);
+    });
+
+    const response: RM.UrlStatisticsResponse = {
+      http_code: 200,
+      total_hits: totalHitsCount,
+      avg_redirect_duration: averageRedirectDuration,
+      latest_hits: __latestHits,
+    };
+
+    return response;
+  } catch (error: any) {
+    const errorResponse: RM.ErrorResponse = {
+      http_code: 500,
+      errors: ["Internal Server Error"],
+    };
+
+    return errorResponse;
+  }
 };
 
 const getDeviceMetricsStatistics = async (
@@ -334,8 +364,6 @@ const getGeographyMetricsStatistics = async (
 
     return response;
   } catch (error) {
-    console.log(error);
-
     const errorResponse: RM.ErrorResponse = {
       http_code: 500,
       errors: ["Internal Server Error"],

@@ -21,7 +21,19 @@ interface GeographicalStatisticsResponse extends StatisticsResponse {
   countries: CountryKey[];
 }
 
-interface UrlStatisticsResponse extends StatisticsResponse {}
+interface LatestHit {
+  ip: string;
+  redirect_duration: number;
+  timestamp: number;
+  device_info: { browser: string; os: string };
+  location: { country: string; timezone: string };
+}
+
+interface UrlStatisticsResponse extends StatisticsResponse {
+  total_hits: number;
+  avg_redirect_duration: number;
+  latest_hits: LatestHit[];
+}
 
 interface DashboardResponse extends StatisticsResponse {
   total_hits: number;
@@ -91,6 +103,7 @@ export {
   ErrorResponse,
   GeneratedShortUrlsResponse,
   GeographicalStatisticsResponse,
+  LatestHit,
   OSKey,
   OsBrowserKey,
   PopularUrlKey,
