@@ -36,10 +36,17 @@ interface UrlMetricsRequest extends _StatisticsRequest {
   limit: number;
 }
 
+interface GeneratedShortUrlsRequest {
+  userId: string;
+  limit: number;
+  offset: number;
+}
+
 interface SummaryRequest extends _StatisticsRequest {}
 
 export {
   DeviceMetricsRequest,
+  GeneratedShortUrlsRequest,
   GeographicalMetricsRequest,
   IpMetricsRequest,
   PopularUrlsRequest,

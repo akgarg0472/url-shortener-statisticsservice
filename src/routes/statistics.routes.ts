@@ -20,6 +20,19 @@ statisticsRouter.get(
 );
 
 statisticsRouter.get(
+  "/generated-urls",
+  validateQueryParams(["userId", "limit", "offset"]),
+  middlewares.addGeneratedShortUrlsRequestAttribute,
+  async (req: Request, res: Response) => {
+    const request: RequestModels.GeneratedShortUrlsRequest = (req as any)
+      .request;
+    const response: StatisticsResponse =
+      await statisticsService.getGeneratedShortUrls(request);
+    sendResponseToClient(response, res);
+  }
+);
+
+statisticsRouter.get(
   "/popular-urls",
   validateQueryParams(["userId", "startTime", "endTime"]),
   middlewares.addPopularUrlRequestAttribute,

@@ -239,8 +239,36 @@ const buildUrlStatsQuery = (request: RequestModels.UrlMetricsRequest) => {
   };
 };
 
+const buildGeneratedShortUrlsQuery = (
+  request: RequestModels.GeneratedShortUrlsRequest
+) => {
+  return {
+    size: request.limit,
+    from: request.offset * request.limit,
+    query: {
+      bool: {
+        must: [
+          {
+            term: {
+              "userId.keyword": request.userId,
+            },
+          },
+        ],
+      },
+    },
+    sort: [
+      {
+        timestamp: {
+          order: "desc",
+        },
+      },
+    ],
+  };
+};
+
 export {
   buildDeviceMetricsQuery,
+  buildGeneratedShortUrlsQuery,
   buildGeographicalQuery,
   buildPopularUrlQuery,
   buildSummaryQuery,

@@ -21,12 +21,6 @@ interface GeographicalStatisticsResponse extends StatisticsResponse {
   countries: CountryKey[];
 }
 
-interface IPStatisticsResponse extends StatisticsResponse {}
-
-interface RedirectStatisticsResponse extends StatisticsResponse {}
-
-interface RedirectTimeStatisticsResponse extends StatisticsResponse {}
-
 interface UrlStatisticsResponse extends StatisticsResponse {}
 
 interface DashboardResponse extends StatisticsResponse {
@@ -74,6 +68,19 @@ interface ContinentKey {
   countries?: CountryKey[];
 }
 
+interface UrlMetadata {
+  original_url: string;
+  short_url: string;
+  created_at: Date;
+  ip_address: string;
+}
+
+interface GeneratedShortUrlsResponse extends StatisticsResponse {
+  total_records: number;
+  next_offset: number;
+  urls: UrlMetadata[];
+}
+
 export {
   BrowserKey,
   CityKey,
@@ -82,14 +89,13 @@ export {
   DashboardResponse,
   DeviceMetricsResponse,
   ErrorResponse,
+  GeneratedShortUrlsResponse,
   GeographicalStatisticsResponse,
-  IPStatisticsResponse,
   OSKey,
   OsBrowserKey,
   PopularUrlKey,
   PopularUrlStatisticsResponse,
-  RedirectStatisticsResponse,
-  RedirectTimeStatisticsResponse,
   StatisticsResponse,
+  UrlMetadata,
   UrlStatisticsResponse,
 };

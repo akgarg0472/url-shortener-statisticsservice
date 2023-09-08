@@ -156,8 +156,27 @@ const addSummaryRequestAttribute = (
   next();
 };
 
+const addGeneratedShortUrlsRequestAttribute = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId, limit, offset } = req.query;
+
+  const generatedShortUrlsRequest: RequestModels.GeneratedShortUrlsRequest = {
+    userId: userId?.toString()!,
+    limit: limit ? parseInt(limit.toString()!) : 5,
+    offset: offset ? parseInt(offset.toString()!) : 0,
+  };
+
+  (req as any).request = generatedShortUrlsRequest;
+
+  next();
+};
+
 export {
   addDeviceMetricsRequestAttribute,
+  addGeneratedShortUrlsRequestAttribute,
   addGeographicalMetricsRequestAttribute,
   addIpRequestRequestAttribute,
   addPopularUrlRequestAttribute,

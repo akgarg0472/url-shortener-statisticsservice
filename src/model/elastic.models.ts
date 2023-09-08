@@ -43,8 +43,26 @@ interface GeoContinentAgg {
   countries?: GeoCountryKey;
 }
 
+interface GeneratedUrlResp {
+  total: {
+    value: number;
+  };
+  hits: EURL[];
+}
+
+interface EURL {
+  _source: {
+    originalUrl: string;
+    shortUrl: string;
+    createdAt: number;
+    ipAddress: string;
+  };
+}
+
 export {
   DeviceMetricResponseKey,
+  EURL,
+  GeneratedUrlResp,
   GeoContinentAgg,
   GeoCountry,
   PopularUrlResponseKey,

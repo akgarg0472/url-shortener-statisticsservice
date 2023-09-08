@@ -4,16 +4,15 @@ import * as RM from "../../model/response.models";
 import { searchDocuments } from "../elastic/elastic.service";
 import * as QueryBuilder from "./queryBuilder.service";
 
-const elasticIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
-
 const getSummaryStatistics = async (
   request: RequestModels.SummaryRequest
 ): Promise<RM.StatisticsResponse> => {
   try {
     const dashboardQuery = QueryBuilder.buildSummaryQuery(request);
+    const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
 
     const searchResponse = await searchDocuments(
-      elasticIndexName!,
+      elasticStatsIndexName!,
       dashboardQuery
     );
 
@@ -61,6 +60,51 @@ const getSummaryStatistics = async (
     };
     return response;
   } catch (error) {
+    const errorResponse: RM.ErrorResponse = {
+      http_code: 500,
+      errors: ["Internal Server Error"],
+    };
+
+    return errorResponse;
+  }
+};
+
+const getGeneratedShortUrls = async (
+  request: RequestModels.GeneratedShortUrlsRequest
+): Promise<RM.StatisticsResponse> => {
+  try {
+    const query = QueryBuilder.buildGeneratedShortUrlsQuery(request);
+    const elasticCreateIndexName = process.env.ELASTIC_CREATE_INDEX_NAME;
+
+    const searchResponse = await searchDocuments(
+      elasticCreateIndexName!,
+      query
+    );
+
+    const generatedShortUrlsResp: EM.GeneratedUrlResp =
+      searchResponse.hits as EM.GeneratedUrlResp;
+
+    const __urls: RM.UrlMetadata[] = [];
+
+    generatedShortUrlsResp.hits.forEach((url) => {
+      const _url: RM.UrlMetadata = {
+        original_url: url._source.originalUrl,
+        short_url: url._source.shortUrl,
+        created_at: new Date(url._source.createdAt),
+        ip_address: url._source.ipAddress,
+      };
+
+      __urls.push(_url);
+    });
+
+    const response: RM.GeneratedShortUrlsResponse = {
+      total_records: generatedShortUrlsResp.total.value,
+      next_offset: request.offset + 1,
+      urls: __urls,
+    };
+
+    return response;
+  } catch (error) {
     console.log(error);
 
     const errorResponse: RM.ErrorResponse = {
@@ -77,9 +121,10 @@ const getPopularUrlsStatistics = async (
 ): Promise<RM.StatisticsResponse> => {
   try {
     const popularUrlQuery = QueryBuilder.buildPopularUrlQuery(request);
+    const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
 
     const searchResponse = await searchDocuments(
-      elasticIndexName!,
+      elasticStatsIndexName!,
       popularUrlQuery
     );
 
@@ -120,9 +165,10 @@ const getUrlStatistics = async (
   request: RequestModels.UrlMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
   const urlStatsQuery = QueryBuilder.buildUrlStatsQuery(request);
+  const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
 
   const searchResponse = await searchDocuments(
-    elasticIndexName!,
+    elasticStatsIndexName!,
     urlStatsQuery
   );
 
@@ -147,9 +193,10 @@ const getDeviceMetricsStatistics = async (
 ): Promise<RM.StatisticsResponse> => {
   try {
     const deviceMetricsQuery = QueryBuilder.buildDeviceMetricsQuery(request);
+    const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
 
     const searchResponse = await searchDocuments(
-      elasticIndexName!,
+      elasticStatsIndexName!,
       deviceMetricsQuery
     );
 
@@ -226,9 +273,10 @@ const getGeographyMetricsStatistics = async (
 ): Promise<RM.StatisticsResponse> => {
   try {
     const geographicaQuery = QueryBuilder.buildGeographicalQuery(request);
+    const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
 
     const searchResponse = await searchDocuments(
-      elasticIndexName!,
+      elasticStatsIndexName!,
       geographicaQuery
     );
 
@@ -299,6 +347,7 @@ const getGeographyMetricsStatistics = async (
 
 export {
   getDeviceMetricsStatistics,
+  getGeneratedShortUrls,
   getGeographyMetricsStatistics,
   getPopularUrlsStatistics,
   getSummaryStatistics,

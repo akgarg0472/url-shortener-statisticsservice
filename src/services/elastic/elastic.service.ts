@@ -7,7 +7,6 @@ import getElasticClient from "../../configs/elastic.configs";
 import { StatisticsEvent } from "../../model/kafka.models";
 
 let elasticClient: Client;
-let elasticIndexName: string;
 
 const initElasticClient = async () => {
   const client: Client = getElasticClient();
@@ -21,12 +20,13 @@ const initElasticClient = async () => {
       console.log("Elasticsearch is down!", err);
     });
 
-  const indexName: string =
-    process.env.ELASTICSEARCH_INDEX_NAME || "urlshortener-statistics";
+  const createIndexName: string =
+    process.env.ELASTIC_CREATE_INDEX_NAME || "urlshortener-create";
+  const elasticStatsIndexName =
+    process.env.ELASTIC_STATS_INDEX_NAME || "urlshortener-fetch";
 
-  elasticIndexName = indexName;
-
-  _createIndex(indexName);
+  _createIndex(createIndexName);
+  _createIndex(elasticStatsIndexName);
 };
 
 const _createIndex = (indexName: string) => {
@@ -62,9 +62,9 @@ const searchDocuments = async (
   return response;
 };
 
-const pushEvent = async (event: StatisticsEvent) => {
+const pushEvent = async (indexName: string, event: StatisticsEvent) => {
   const response = await elasticClient.index({
-    index: elasticIndexName,
+    index: indexName,
     body: event,
   });
 
