@@ -42,9 +42,14 @@ interface GeneratedShortUrlsRequest {
   offset: number;
 }
 
-interface SummaryRequest extends _StatisticsRequest {}
+interface DashboardRequest extends _StatisticsRequest {
+  currentDayStartTime: number;
+  currentTime: number;
+  oneWeekOldTime: number;
+}
 
 export {
+  DashboardRequest,
   DeviceMetricsRequest,
   GeneratedShortUrlsRequest,
   GeographicalMetricsRequest,
@@ -52,6 +57,5 @@ export {
   PopularUrlsRequest,
   RedirectStatisticsRequest,
   RedirectTimeRequest,
-  SummaryRequest,
   UrlMetricsRequest,
 };

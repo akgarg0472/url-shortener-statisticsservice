@@ -47,6 +47,15 @@ const _createIndex = (indexName: string) => {
     });
 };
 
+const multiSearch = async (indexName: string, request: any) => {
+  const response = await elasticClient.msearch({
+    index: indexName,
+    body: request,
+  });
+
+  return response;
+};
+
 const searchDocuments = async (
   indexName: string,
   request: any
@@ -71,4 +80,4 @@ const pushEvent = async (indexName: string, event: StatisticsEvent) => {
   console.log(response);
 };
 
-export { initElasticClient, pushEvent, searchDocuments };
+export { initElasticClient, multiSearch, pushEvent, searchDocuments };

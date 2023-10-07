@@ -1,37 +1,48 @@
 import * as EM from "../../model/elastic.models";
 import * as RequestModels from "../../model/request.models";
 import * as RM from "../../model/response.models";
-import { searchDocuments } from "../elastic/elastic.service";
+import { multiSearch, searchDocuments } from "../elastic/elastic.service";
 import * as QueryBuilder from "./queryBuilder.service";
 
 const getSummaryStatistics = async (
-  request: RequestModels.SummaryRequest
+  request: RequestModels.DashboardRequest
 ): Promise<RM.StatisticsResponse> => {
   try {
-    const dashboardQuery = QueryBuilder.buildSummaryQuery(request);
-    const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
+    const statsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
+    const createIndexName = process.env.ELASTIC_CREATE_INDEX_NAME;
 
-    const searchResponse = await searchDocuments(
-      elasticStatsIndexName!,
+    const dashboardQuery = QueryBuilder.buildDashboardQuery(
+      request,
+      createIndexName!,
+      statsIndexName!
+    );
+
+    const searchResponse: any = await multiSearch(
+      statsIndexName!,
       dashboardQuery
     );
 
-    const totalHits: number = (searchResponse.aggregations?.total_hits as any)
-      .value;
+    const totalHits: number = (
+      searchResponse.responses[0].aggregations?.total_hits as any
+    ).value;
+
+    const currentDayHitsCount = (
+      searchResponse.responses[0].aggregations?.current_day_hits as any
+    ).doc_count;
 
     const averageRedirectDuration: number = parseFloat(
       (
-        (searchResponse.aggregations?.avg_redirect_duration as any)
+        (searchResponse.responses[0].aggregations?.avg_redirect_duration as any)
           .value as number
       ).toFixed(2)
     );
 
     const continentAgg: EM.GeoContinentAgg[] = (
-      searchResponse.aggregations?.continents as any
+      searchResponse.responses[0].aggregations?.continents as any
     ).buckets;
 
     const countriesAgg: EM.GeoCountry[] = (
-      searchResponse.aggregations?.countries as any
+      searchResponse.responses[0].aggregations?.countries as any
     ).buckets;
 
     const __continents: RM.ContinentKey[] = continentAgg.map((continent) => {
@@ -51,13 +62,28 @@ const getSummaryStatistics = async (
       return _country;
     });
 
+    const currentDayUrlsCreated: number =
+      searchResponse.responses[1].hits.total.value;
+
+    const prevSevenDaysHits: RM.PerDayHitStats[] = extractPrevSevenDaysHits(
+      searchResponse.responses[2]
+    );
+
     const response: RM.DashboardResponse = {
       http_code: 200,
-      total_hits: totalHits,
-      avg_redirect_duration: averageRedirectDuration,
+      lifetime_stats: {
+        total_hits: totalHits,
+        avg_redirect_duration: averageRedirectDuration,
+      },
+      current_day_stats: {
+        total_hits: currentDayHitsCount,
+        urls_created: currentDayUrlsCreated,
+      },
       continents: __continents.slice(0, 5),
       countries: __countries.slice(0, 5),
+      prev_seven_days_hits: prevSevenDaysHits,
     };
+
     return response;
   } catch (error) {
     const errorResponse: RM.ErrorResponse = {
@@ -371,6 +397,29 @@ const getGeographyMetricsStatistics = async (
 
     return errorResponse;
   }
+};
+
+const extractPrevSevenDaysHits = (response: any): RM.PerDayHitStats[] => {
+  const status = response.status;
+
+  if (status !== 200 || !response.aggregations) {
+    return [];
+  }
+
+  const bucket: any[] = response.aggregations.prev_seven_days_hits?.buckets;
+
+  const prevSevenDaysHits: RM.PerDayHitStats[] = [];
+
+  bucket.forEach((b) => {
+    const _b: RM.PerDayHitStats = {
+      timestamp: b.key,
+      hits: b.doc_count,
+    };
+
+    prevSevenDaysHits.push(_b);
+  });
+
+  return prevSevenDaysHits;
 };
 
 export {

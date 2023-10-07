@@ -145,12 +145,22 @@ const addSummaryRequestAttribute = (
   res: Response,
   next: NextFunction
 ) => {
-  const { userId, startTime, endTime } = req.query;
+  const {
+    userId,
+    startTime,
+    endTime,
+    currentDayStartTime,
+    currentTime,
+    oneWeekOldTime,
+  } = req.query;
 
-  const dashboardRequest: RequestModels.SummaryRequest = {
+  const dashboardRequest: RequestModels.DashboardRequest = {
     userId: userId?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
+    currentDayStartTime: parseInt(currentDayStartTime?.toString()!),
+    currentTime: parseInt(currentTime?.toString()!),
+    oneWeekOldTime: parseInt(oneWeekOldTime?.toString()!),
   };
 
   (req as any).request = dashboardRequest;

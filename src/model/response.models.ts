@@ -21,6 +21,11 @@ interface GeographicalStatisticsResponse extends StatisticsResponse {
   countries: CountryKey[];
 }
 
+interface PerDayHitStats {
+  timestamp: number;
+  hits: number;
+}
+
 interface LatestHit {
   ip: string;
   redirect_duration: number;
@@ -36,10 +41,17 @@ interface UrlStatisticsResponse extends StatisticsResponse {
 }
 
 interface DashboardResponse extends StatisticsResponse {
-  total_hits: number;
-  avg_redirect_duration: number;
+  lifetime_stats: {
+    total_hits: number;
+    avg_redirect_duration: number;
+  };
+  current_day_stats: {
+    total_hits: number;
+    urls_created: number;
+  };
   countries: CountryKey[];
   continents: ContinentKey[];
+  prev_seven_days_hits: PerDayHitStats[];
 }
 
 interface PopularUrlKey {
@@ -106,6 +118,7 @@ export {
   LatestHit,
   OSKey,
   OsBrowserKey,
+  PerDayHitStats,
   PopularUrlKey,
   PopularUrlStatisticsResponse,
   StatisticsResponse,

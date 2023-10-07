@@ -8,11 +8,18 @@ import * as statisticsService from "../services/statistics/statistics.service";
 const statisticsRouter = express.Router();
 
 statisticsRouter.get(
-  "/summary",
-  validateQueryParams(["userId", "startTime", "endTime"]),
+  "/dashboard",
+  validateQueryParams([
+    "userId",
+    "startTime",
+    "endTime",
+    "currentDayStartTime",
+    "currentTime",
+    "oneWeekOldTime",
+  ]),
   middlewares.addSummaryRequestAttribute,
   async (req: Request, res: Response) => {
-    const request: RequestModels.SummaryRequest = (req as any).request;
+    const request: RequestModels.DashboardRequest = (req as any).request;
     const response: StatisticsResponse =
       await statisticsService.getSummaryStatistics(request);
     sendResponseToClient(response, res);
