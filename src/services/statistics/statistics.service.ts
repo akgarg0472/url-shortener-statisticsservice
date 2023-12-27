@@ -34,7 +34,7 @@ const getSummaryStatistics = async (
       (
         (searchResponse.responses[0].aggregations?.avg_redirect_duration as any)
           .value as number
-      ).toFixed(2)
+      )?.toFixed(2)
     );
 
     const continentAgg: EM.GeoContinentAgg[] = (
@@ -69,26 +69,50 @@ const getSummaryStatistics = async (
       searchResponse.responses[2]
     );
 
+    const lifetimeStats: RM.DashboardApiStat[] = [
+      {
+        key: "Total Hits",
+        value: totalHits,
+        icon: "/assets/icons/total-hits.png",
+      },
+      {
+        key: "Avg Redirect Duration",
+        value: averageRedirectDuration
+          ? `${averageRedirectDuration.toFixed(2)} ms`
+          : `0 ms`,
+        icon: "/assets/icons/clock.png",
+      },
+    ];
+
+    const currentDayStats: RM.DashboardApiStat[] = [
+      {
+        key: "Total Hits",
+        value: currentDayHitsCount,
+        icon: "/assets/icons/total-hits.png",
+      },
+      {
+        key: "New Links",
+        value: currentDayUrlsCreated,
+        icon: "/assets/icons/add-link.png",
+      },
+    ];
+
     const response: RM.DashboardResponse = {
-      http_code: 200,
-      lifetime_stats: {
-        total_hits: totalHits,
-        avg_redirect_duration: averageRedirectDuration,
-      },
-      current_day_stats: {
-        total_hits: currentDayHitsCount,
-        urls_created: currentDayUrlsCreated,
-      },
+      status_code: 200,
+      lifetime_stats: lifetimeStats,
+      current_day_stats: currentDayStats,
       continents: __continents.slice(0, 5),
       countries: __countries.slice(0, 5),
       prev_seven_days_hits: prevSevenDaysHits,
     };
 
     return response;
-  } catch (error) {
+  } catch (err) {
+    console.log(`Error in GET summary: ${err}`);
     const errorResponse: RM.ErrorResponse = {
-      http_code: 500,
+      status_code: 500,
       errors: ["Internal Server Error"],
+      message: "Internal Server Error",
     };
 
     return errorResponse;
@@ -132,8 +156,9 @@ const getGeneratedShortUrls = async (
     return response;
   } catch (error) {
     const errorResponse: RM.ErrorResponse = {
-      http_code: 500,
+      status_code: 500,
       errors: ["Internal Server Error"],
+      message: "Internal Server Error",
     };
 
     return errorResponse;
@@ -175,8 +200,9 @@ const getPopularUrlsStatistics = async (
     return Promise.resolve(popularUrlResponse);
   } catch (error: any) {
     const errorResponse: RM.ErrorResponse = {
-      http_code: 500,
+      status_code: 500,
       errors: ["Internal Server Error"],
+      message: "Internal Server Error",
     };
 
     return errorResponse;
@@ -202,7 +228,7 @@ const getUrlStatistics = async (
     const averageRedirectDuration = parseFloat(
       (
         (searchResponse.aggregations?.avg_event_duration as any).value as number
-      ).toFixed(2)
+      )?.toFixed(2)
     );
 
     const latestHits: EM.LatestHitsAggResp = (
@@ -227,17 +253,22 @@ const getUrlStatistics = async (
     });
 
     const response: RM.UrlStatisticsResponse = {
-      http_code: 200,
+      status_code: 200,
       total_hits: totalHitsCount,
-      avg_redirect_duration: averageRedirectDuration,
+      avg_redirect_duration: averageRedirectDuration
+        ? `${averageRedirectDuration} ms`
+        : `0 ms`,
       latest_hits: __latestHits,
     };
 
     return response;
   } catch (error: any) {
+    console.log(error);
+
     const errorResponse: RM.ErrorResponse = {
-      http_code: 500,
+      status_code: 500,
       errors: ["Internal Server Error"],
+      message: "Internal Server Error",
     };
 
     return errorResponse;
@@ -307,7 +338,7 @@ const getDeviceMetricsStatistics = async (
     }
 
     const response: RM.DeviceMetricsResponse = {
-      http_code: 200,
+      status_code: 200,
       os_browsers: __osBrowsers,
       browsers: __browsers,
       oss: __operatingSystems,
@@ -316,8 +347,9 @@ const getDeviceMetricsStatistics = async (
     return Promise.resolve(response);
   } catch (error) {
     const errorResponse: RM.ErrorResponse = {
-      http_code: 500,
+      status_code: 500,
       errors: ["Internal Server Error"],
+      message: "Internal Server Error",
     };
 
     return errorResponse;
@@ -383,7 +415,7 @@ const getGeographyMetricsStatistics = async (
     __countries.sort((c1, c2) => c1.hits_count - c2.hits_count);
 
     const response: RM.GeographicalStatisticsResponse = {
-      http_code: 200,
+      status_code: 200,
       continents: __continents,
       countries: __countries,
     };
@@ -391,8 +423,9 @@ const getGeographyMetricsStatistics = async (
     return response;
   } catch (error) {
     const errorResponse: RM.ErrorResponse = {
-      http_code: 500,
+      status_code: 500,
       errors: ["Internal Server Error"],
+      message: "Internal Server Error",
     };
 
     return errorResponse;

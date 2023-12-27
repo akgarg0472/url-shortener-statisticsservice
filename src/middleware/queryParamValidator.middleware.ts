@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { ErrorResponse } from "../model/response.models";
 
-const validateQueryParams = (paramNames: string[]) => {
+const validateQueryParamsAndReturnErrorResponseIfError = (
+  paramNames: string[]
+) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const invalidParamNames = [];
 
@@ -17,9 +19,8 @@ const validateQueryParams = (paramNames: string[]) => {
       const errorResponse: ErrorResponse =
         generateErrorResponse(invalidParamNames);
 
-      if (errorResponse.http_code) {
-        res.status(errorResponse.http_code);
-        delete errorResponse.http_code;
+      if (errorResponse.status_code) {
+        res.status(errorResponse.status_code);
       }
 
       res.json(errorResponse);
@@ -35,13 +36,14 @@ const generateErrorResponse = (invalidParamNames: string[]): ErrorResponse => {
   const errors: string[] = [];
 
   for (const paramName of invalidParamNames) {
-    errors.push(`Parameter '${paramName}' is required`);
+    errors.push(`Param '${paramName}' is required`);
   }
 
   return {
-    http_code: 400,
+    status_code: 400,
+    message: "Missing required params",
     errors,
   };
 };
 
-export default validateQueryParams;
+export default validateQueryParamsAndReturnErrorResponseIfError;

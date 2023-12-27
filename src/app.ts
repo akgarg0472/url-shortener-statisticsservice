@@ -1,5 +1,5 @@
 import express, { Application, Request, Response } from "express";
-import statisticsRoutes from "./routes/statistics.routes";
+import statisticsRouterV1 from "./routes/statistics.routes.v1";
 
 const app: Application = express();
 
@@ -11,6 +11,6 @@ app.get("/health", (req: Request, res: Response) => {
   res.send("UP");
 });
 
-app.use("/statistics", statisticsRoutes);
+app.use("/api/v1/statistics", statisticsRouterV1);
 
 export default app;

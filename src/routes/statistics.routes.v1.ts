@@ -1,15 +1,15 @@
 import express, { Request, Response } from "express";
-import validateQueryParams from "../middleware/queryParamValidator.middleware";
+import validateQueryParamsAndReturnErrorResponseIfError from "../middleware/queryParamValidator.middleware";
 import * as middlewares from "../middleware/requestAttributeAdd.middleware";
 import * as RequestModels from "../model/request.models";
 import { StatisticsResponse } from "../model/response.models";
 import * as statisticsService from "../services/statistics/statistics.service";
 
-const statisticsRouter = express.Router();
+const statisticsRouterV1 = express.Router();
 
-statisticsRouter.get(
-  "/dashboard",
-  validateQueryParams([
+statisticsRouterV1.get(
+  "/dashboard-summary",
+  validateQueryParamsAndReturnErrorResponseIfError([
     "userId",
     "startTime",
     "endTime",
@@ -26,9 +26,13 @@ statisticsRouter.get(
   }
 );
 
-statisticsRouter.get(
+statisticsRouterV1.get(
   "/generated-urls",
-  validateQueryParams(["userId", "limit", "offset"]),
+  validateQueryParamsAndReturnErrorResponseIfError([
+    "userId",
+    "limit",
+    "offset",
+  ]),
   middlewares.addGeneratedShortUrlsRequestAttribute,
   async (req: Request, res: Response) => {
     const request: RequestModels.GeneratedShortUrlsRequest = (req as any)
@@ -39,9 +43,13 @@ statisticsRouter.get(
   }
 );
 
-statisticsRouter.get(
+statisticsRouterV1.get(
   "/popular-urls",
-  validateQueryParams(["userId", "startTime", "endTime"]),
+  validateQueryParamsAndReturnErrorResponseIfError([
+    "userId",
+    "startTime",
+    "endTime",
+  ]),
   middlewares.addPopularUrlRequestAttribute,
   async (req: Request, res: Response) => {
     const request: RequestModels.PopularUrlsRequest = (req as any).request;
@@ -51,9 +59,15 @@ statisticsRouter.get(
   }
 );
 
-statisticsRouter.get(
+statisticsRouterV1.get(
   "/url-metrics",
-  validateQueryParams(["userId", "shortUrl", "startTime", "limit", "endTime"]),
+  validateQueryParamsAndReturnErrorResponseIfError([
+    "userId",
+    "shortUrl",
+    "startTime",
+    "limit",
+    "endTime",
+  ]),
   middlewares.addUrlMetricsRequestAttribute,
   async (req: Request, res: Response) => {
     const request: RequestModels.UrlMetricsRequest = (req as any).request;
@@ -63,9 +77,14 @@ statisticsRouter.get(
   }
 );
 
-statisticsRouter.get(
+statisticsRouterV1.get(
   "/device-metrics",
-  validateQueryParams(["shortUrl", "userId", "startTime", "endTime"]),
+  validateQueryParamsAndReturnErrorResponseIfError([
+    "shortUrl",
+    "userId",
+    "startTime",
+    "endTime",
+  ]),
   middlewares.addDeviceMetricsRequestAttribute,
   async (req: Request, res: Response) => {
     const request: RequestModels.DeviceMetricsRequest = (req as any).request;
@@ -75,9 +94,13 @@ statisticsRouter.get(
   }
 );
 
-statisticsRouter.get(
+statisticsRouterV1.get(
   "/geographical-metrics",
-  validateQueryParams(["shortUrl", "startTime", "endTime"]),
+  validateQueryParamsAndReturnErrorResponseIfError([
+    "shortUrl",
+    "startTime",
+    "endTime",
+  ]),
   middlewares.addGeographicalMetricsRequestAttribute,
   async (req: Request, res: Response) => {
     const request: RequestModels.GeographicalMetricsRequest = (req as any)
@@ -89,12 +112,11 @@ statisticsRouter.get(
 );
 
 const sendResponseToClient = (response: StatisticsResponse, res: Response) => {
-  if (response.http_code) {
-    res.status(response.http_code);
-    delete response.http_code;
+  if (response.status_code) {
+    res.status(response.status_code);
   }
 
   res.json(response);
 };
 
-export default statisticsRouter;
+export default statisticsRouterV1;

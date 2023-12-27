@@ -12,7 +12,7 @@ const buildDashboardQuery = (
       query: {
         bool: {
           must: [
-            { term: { "userId.keyword": "3087b56d0b954afaa0a528188d72d393" } },
+            { term: { "userId.keyword": request.userId } },
             {
               range: {
                 timestamp: { gte: request.startTime, lte: request.endTime },

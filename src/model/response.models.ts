@@ -1,9 +1,10 @@
 interface StatisticsResponse {
-  http_code?: number;
+  status_code?: number;
 }
 
 interface ErrorResponse extends StatisticsResponse {
   errors: string[];
+  message: string;
 }
 
 interface PopularUrlStatisticsResponse extends StatisticsResponse {
@@ -36,19 +37,19 @@ interface LatestHit {
 
 interface UrlStatisticsResponse extends StatisticsResponse {
   total_hits: number;
-  avg_redirect_duration: number;
+  avg_redirect_duration: string;
   latest_hits: LatestHit[];
 }
 
+interface DashboardApiStat {
+  key: string;
+  value: any;
+  icon: string;
+}
+
 interface DashboardResponse extends StatisticsResponse {
-  lifetime_stats: {
-    total_hits: number;
-    avg_redirect_duration: number;
-  };
-  current_day_stats: {
-    total_hits: number;
-    urls_created: number;
-  };
+  lifetime_stats: DashboardApiStat[];
+  current_day_stats: DashboardApiStat[];
   countries: CountryKey[];
   continents: ContinentKey[];
   prev_seven_days_hits: PerDayHitStats[];
@@ -110,6 +111,7 @@ export {
   CityKey,
   ContinentKey,
   CountryKey,
+  DashboardApiStat,
   DashboardResponse,
   DeviceMetricsResponse,
   ErrorResponse,
