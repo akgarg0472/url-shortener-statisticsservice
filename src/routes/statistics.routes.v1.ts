@@ -2,10 +2,23 @@ import express, { Request, Response } from "express";
 import validateQueryParamsAndReturnErrorResponseIfError from "../middleware/queryParamValidator.middleware";
 import * as middlewares from "../middleware/requestAttributeAdd.middleware";
 import * as RequestModels from "../model/request.models";
-import { StatisticsResponse } from "../model/response.models";
+import { PingResponse, StatisticsResponse } from "../model/response.models";
 import * as statisticsService from "../services/statistics/statistics.service";
 
 const statisticsRouterV1 = express.Router();
+
+statisticsRouterV1.get("/health", (req: Request, res: Response) => {
+  console.log();
+  const pingResp: PingResponse = {
+    status_code: 200,
+    message: "Server is UP and running",
+    params: {
+      ip: req.ip,
+    },
+  };
+
+  sendResponseToClient(pingResp, res);
+});
 
 statisticsRouterV1.get(
   "/dashboard-summary",

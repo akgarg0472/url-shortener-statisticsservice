@@ -2,6 +2,11 @@ interface StatisticsResponse {
   status_code?: number;
 }
 
+interface PingResponse extends StatisticsResponse {
+  message: string;
+  params: any;
+}
+
 interface ErrorResponse extends StatisticsResponse {
   errors: string[];
   message: string;
@@ -107,6 +112,7 @@ interface GeneratedShortUrlsResponse extends StatisticsResponse {
 }
 
 export {
+  PingResponse,
   BrowserKey,
   CityKey,
   ContinentKey,

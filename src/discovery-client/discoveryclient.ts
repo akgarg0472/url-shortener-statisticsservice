@@ -15,7 +15,7 @@ const initDiscoveryClient = () => {
 const getEurekaClient = (): Eureka => {
   const client = new Eureka({
     instance: {
-      app: "statistics-service",
+      app: "urlshortener-statistics-service",
       hostName: "localhost",
       ipAddr: "127.0.0.1",
       port: {
@@ -44,7 +44,7 @@ const getEurekaClient = (): Eureka => {
 };
 
 const getApplicationPort = (): number => {
-  const port = process.env.PORT || "3000";
+  const port = process.env.SERVER_PORT || "3000";
   return parseInt(port);
 };
 
