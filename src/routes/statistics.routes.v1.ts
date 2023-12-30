@@ -93,7 +93,7 @@ statisticsRouterV1.get(
 statisticsRouterV1.get(
   "/device-metrics",
   validateQueryParamsAndReturnErrorResponseIfError([
-    "shortUrl",
+    // "shortUrl",
     "userId",
     "startTime",
     "endTime",
@@ -110,7 +110,7 @@ statisticsRouterV1.get(
 statisticsRouterV1.get(
   "/geographical-metrics",
   validateQueryParamsAndReturnErrorResponseIfError([
-    "shortUrl",
+    // "shortUrl",
     "startTime",
     "endTime",
   ]),

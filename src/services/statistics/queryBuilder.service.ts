@@ -146,11 +146,11 @@ const buildDeviceMetricsQuery = (
               userId: request.userId,
             },
           },
-          {
-            match: {
-              shortUrl: request.shortUrl,
-            },
-          },
+          // {
+          //   match: {
+          //     shortUrl: request.shortUrl,
+          //   },
+          // },
           {
             range: {
               timestamp: {
@@ -194,11 +194,11 @@ const buildGeographicalQuery = (
               userId: request.userId,
             },
           },
-          {
-            match: {
-              shortUrl: request.shortUrl,
-            },
-          },
+          // {
+          //   match: {
+          //     shortUrl: request.shortUrl,
+          //   },
+          // },
           {
             range: {
               timestamp: {
