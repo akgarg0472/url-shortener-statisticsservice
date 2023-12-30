@@ -9,6 +9,8 @@ import {
   logLevel,
 } from "kafkajs";
 
+let kafkaConsumer: Consumer;
+
 const createKafkaConsumer = (
   brokersUrl: string[] = ["localhost:9092"],
   loggingLevel: logLevel = logLevel.ERROR
@@ -47,12 +49,12 @@ const initKafkaConsumer = async (
   });
 };
 
-const disconnectConsumer = async (consumer: Consumer) => {
+const disconnectKafkaConsumer = async () => {
   try {
-    await consumer.disconnect();
+    await kafkaConsumer.disconnect();
     console.log("Disconnected from kafka");
-  } catch (error) {
-    console.log("Error while disconnecting from kafka: ", error);
+  } catch (err) {
+    console.log("Error while disconnecting from kafka: ", err);
   }
 };
 
@@ -60,8 +62,8 @@ const initKafkaWithTopicAndMessageHandler = async (
   topics: string[],
   messageHandler: EachMessageHandler
 ) => {
-  const consumer: Consumer = createKafkaConsumer();
-  await initKafkaConsumer(consumer, topics, messageHandler);
+  kafkaConsumer = createKafkaConsumer();
+  await initKafkaConsumer(kafkaConsumer, topics, messageHandler);
 };
 
 const isKafkaConnectivityFailedError = (error: any): boolean => {
@@ -71,4 +73,4 @@ const isKafkaConnectivityFailedError = (error: any): boolean => {
   );
 };
 
-export { disconnectConsumer, initKafkaWithTopicAndMessageHandler };
+export { initKafkaWithTopicAndMessageHandler, disconnectKafkaConsumer };

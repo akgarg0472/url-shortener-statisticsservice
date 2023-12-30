@@ -29,11 +29,20 @@ const initElasticClient = async () => {
   _createIndex(elasticStatsIndexName);
 };
 
+const destroyElasticClient = async () => {
+  try {
+    await elasticClient.close();
+    console.info("Disconnected from ELK");
+  } catch (err) {
+    console.error("Error disconnecting ELK", err);
+  }
+};
+
 const _createIndex = (indexName: string) => {
   elasticClient.indices
     .create({ index: indexName })
     .then((res) => {
-      console.log(`Created index ${indexName}...`);
+      console.log(`Created index ${indexName}...: ${res.acknowledged}`);
     })
     .catch((err) => {
       const status = err.meta?.body?.status;
@@ -71,7 +80,10 @@ const searchDocuments = async (
   return response;
 };
 
-const pushEvent = async (indexName: string, event: StatisticsEvent) => {
+const pushEventToElastic = async (
+  indexName: string,
+  event: StatisticsEvent
+) => {
   const response = await elasticClient.index({
     index: indexName,
     body: event,
@@ -80,4 +92,10 @@ const pushEvent = async (indexName: string, event: StatisticsEvent) => {
   console.log(response);
 };
 
-export { initElasticClient, multiSearch, pushEvent, searchDocuments };
+export {
+  initElasticClient,
+  destroyElasticClient,
+  multiSearch,
+  pushEventToElastic,
+  searchDocuments,
+};

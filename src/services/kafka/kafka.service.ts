@@ -1,8 +1,9 @@
 import { EachMessageHandler, KafkaMessage } from "kafkajs";
 import { initKafkaWithTopicAndMessageHandler } from "../../configs/kafka.configs";
-import { StatisticsEvent } from "../../model/kafka.models";
+import { EventType, StatisticsEvent } from "../../model/kafka.models";
+import { pushEventToElastic } from "../elastic/elastic.service";
 
-const initKafka = async () => {
+const initKafkaConsumer = async () => {
   const topicName: string =
     process.env.KAFKA_TOPIC_NAME || "urlshortener-statistics-events";
   initKafkaWithTopicAndMessageHandler([topicName], kafkaMessageHandler);
@@ -24,7 +25,32 @@ const onMessage = (message: KafkaMessage) => {
     timestamp: new Date().getTime(),
   };
 
-  console.log("Statistics event received:", statisticsEvent);
+  const indexName: string | null = determineElasticIndexName(
+    statisticsEvent.eventType
+  );
+
+  if (!indexName) {
+    console.error(`Invalid index name for event push: ${indexName}`);
+    return;
+  }
+
+  pushEventToElastic(indexName, statisticsEvent);
 };
 
-export { initKafka, kafkaMessageHandler };
+const determineElasticIndexName = (eventType: EventType): string | null => {
+  if (
+    eventType === EventType.URL_CREATE_SUCCESS ||
+    eventType === EventType.URL_CREATE_FAILED
+  ) {
+    return process.env.ELASTIC_CREATE_INDEX_NAME || "urlshortener-create";
+  } else if (
+    eventType === EventType.URL_GET_SUCCESS ||
+    eventType === EventType.URL_GET_FAILED
+  ) {
+    return process.env.ELASTIC_STATS_INDEX_NAME || "urlshortener-fetch";
+  } else {
+    return null;
+  }
+};
+
+export { initKafkaConsumer };
