@@ -17,7 +17,7 @@ const initElasticClient = async () => {
       elasticClient = client;
     })
     .catch((err) => {
-      console.log("Elasticsearch is down!", err);
+      console.error("Elasticsearch is down!", err);
     });
 
   const createIndexName: string =
@@ -49,9 +49,9 @@ const _createIndex = (indexName: string) => {
       const error = err.meta?.body?.error?.type;
 
       if (status === 400 && error === "resource_already_exists_exception") {
-        console.log(`Elastic index '${indexName}' already exists...`);
+        console.error(`Elastic index '${indexName}' already exists...`);
       } else {
-        console.log(err);
+        console.error(err);
       }
     });
 };
@@ -80,16 +80,11 @@ const searchDocuments = async (
   return response;
 };
 
-const pushEventToElastic = async (
-  indexName: string,
-  event: StatisticsEvent
-) => {
-  const response = await elasticClient.index({
+const pushEventToElastic = async (indexName: string, event: any) => {
+  await elasticClient.index({
     index: indexName,
     body: event,
   });
-
-  console.log(response);
 };
 
 export {

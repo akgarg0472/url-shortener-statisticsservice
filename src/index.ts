@@ -10,6 +10,7 @@ import {
 } from "./services/elastic/elastic.service";
 import { initKafkaConsumer } from "./services/kafka/kafka.service";
 import { disconnectKafkaConsumer } from "./configs/kafka.configs";
+import { initGeoLocation } from "./services/geolocation/geolocation.service";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ const server = app.listen(port, () => {
   initDiscoveryClient();
   initElasticClient();
   initKafkaConsumer();
+  initGeoLocation();
   console.log(`Server is listening on: ${JSON.stringify(server.address())}`);
 });
 
@@ -28,7 +30,7 @@ const doCleanup = async () => {
     await destroyElasticClient();
     await disconnectKafkaConsumer();
   } catch (err) {
-    console.log(`Error cleaning up resources: ${err}`);
+    console.error(`Error cleaning up resources: ${err}`);
   } finally {
     process.exit(0);
   }

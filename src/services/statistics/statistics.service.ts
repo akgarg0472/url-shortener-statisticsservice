@@ -108,7 +108,6 @@ const getSummaryStatistics = async (
 
     return response;
   } catch (err) {
-    console.log(`Error in GET summary: ${err}`);
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
       errors: ["Internal Server Error"],
@@ -263,8 +262,6 @@ const getUrlStatistics = async (
 
     return response;
   } catch (error: any) {
-    console.log(error);
-
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
       errors: ["Internal Server Error"],

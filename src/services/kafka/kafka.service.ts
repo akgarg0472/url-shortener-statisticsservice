@@ -2,6 +2,12 @@ import { EachMessageHandler, KafkaMessage } from "kafkajs";
 import { initKafkaWithTopicAndMessageHandler } from "../../configs/kafka.configs";
 import { EventType, StatisticsEvent } from "../../model/kafka.models";
 import { pushEventToElastic } from "../elastic/elastic.service";
+import {
+  UrlCreateStatisticsEvent,
+  UrlFetchStatisticsEvent,
+} from "../../model/models.events";
+import { getGeoLocation } from "../geolocation/geolocation.service";
+import { getDeviceInfo } from "../ua/useragent.service";
 
 const initKafkaConsumer = async () => {
   const topicName: string =
@@ -20,13 +26,13 @@ const onMessage = (message: KafkaMessage) => {
     return;
   }
 
-  const statisticsEvent: StatisticsEvent = {
+  const kafkaEvent: StatisticsEvent = {
     ...JSON.parse(messageString),
     timestamp: new Date().getTime(),
   };
 
   const indexName: string | null = determineElasticIndexName(
-    statisticsEvent.eventType
+    kafkaEvent.eventType
   );
 
   if (!indexName) {
@@ -34,7 +40,48 @@ const onMessage = (message: KafkaMessage) => {
     return;
   }
 
-  pushEventToElastic(indexName, statisticsEvent);
+  const statisticsEvent = getStatisticsEvent(kafkaEvent);
+
+  if (statisticsEvent !== null) {
+    pushEventToElastic(indexName, statisticsEvent);
+  }
+};
+
+const getStatisticsEvent = (kafkaEvent: StatisticsEvent): any => {
+  switch (kafkaEvent.eventType) {
+    case EventType.URL_CREATE_SUCCESS:
+    case EventType.URL_CREATE_FAILED:
+      const urlCreateSuccessEvent: UrlCreateStatisticsEvent = {
+        requestId: kafkaEvent.requestId,
+        eventType: kafkaEvent.eventType.toString(),
+        ipAddress: kafkaEvent.ipAddress,
+        originalUrl: kafkaEvent.originalUrl,
+        createdAt: kafkaEvent.createdAt,
+        shortUrl: kafkaEvent.shortUrl,
+        eventDuration: kafkaEvent.eventDuration,
+        userId: kafkaEvent.userId,
+        geoLocation: getGeoLocation(kafkaEvent.ipAddress),
+        timestamp: kafkaEvent.timestamp,
+        deviceInfo: getDeviceInfo(kafkaEvent.userAgent),
+      };
+      return urlCreateSuccessEvent;
+
+    case EventType.URL_GET_SUCCESS:
+    case EventType.URL_GET_FAILED:
+      const urlFetchSuccessEvent: UrlFetchStatisticsEvent = {
+        requestId: kafkaEvent.requestId,
+        eventType: kafkaEvent.eventType.toString(),
+        ipAddress: kafkaEvent.ipAddress,
+        originalUrl: kafkaEvent.originalUrl,
+        shortUrl: kafkaEvent.shortUrl,
+        eventDuration: kafkaEvent.eventDuration,
+        userId: kafkaEvent.userId,
+        geoLocation: getGeoLocation(kafkaEvent.ipAddress),
+        timestamp: kafkaEvent.timestamp,
+        deviceInfo: getDeviceInfo(kafkaEvent.userAgent),
+      };
+      return urlFetchSuccessEvent;
+  }
 };
 
 const determineElasticIndexName = (eventType: EventType): string | null => {

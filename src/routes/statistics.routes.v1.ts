@@ -8,7 +8,6 @@ import * as statisticsService from "../services/statistics/statistics.service";
 const statisticsRouterV1 = express.Router();
 
 statisticsRouterV1.get("/health", (req: Request, res: Response) => {
-  console.log();
   const pingResp: PingResponse = {
     status_code: 200,
     message: "Server is UP and running",
