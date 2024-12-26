@@ -23,7 +23,9 @@ const getGeoLocation = (ip: string): GeoLocationInfo => {
     };
 
     return location;
-  } catch (error) {
+  } catch (error: any) {
+    console.error(error);
+
     return {
       city: "unidentified",
       country: "unidentified",

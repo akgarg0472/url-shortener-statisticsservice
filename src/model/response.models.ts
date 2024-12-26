@@ -49,7 +49,7 @@ interface UrlStatisticsResponse extends StatisticsResponse {
 interface DashboardApiStat {
   key: string;
   value: any;
-  icon: string;
+  suffix: string;
 }
 
 interface DashboardResponse extends StatisticsResponse {
@@ -63,6 +63,7 @@ interface DashboardResponse extends StatisticsResponse {
 interface PopularUrlKey {
   short_url: string;
   hits_count: number;
+  original_url?: string;
 }
 
 interface BrowserKey {

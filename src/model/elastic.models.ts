@@ -1,6 +1,7 @@
 interface PopularUrlResponseKey {
   key: string;
   doc_count: number;
+  original_url: any;
 }
 
 interface Browser {

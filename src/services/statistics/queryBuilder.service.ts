@@ -126,6 +126,21 @@ const buildPopularUrlQuery = (request: RequestModels.PopularUrlsRequest) => {
             _count: request.sortOrder,
           },
         },
+        aggs: {
+          most_hits: {
+            value_count: {
+              field: "shortUrl.keyword",
+            },
+          },
+          original_url: {
+            top_hits: {
+              size: 1,
+              _source: {
+                includes: ["originalUrl"],
+              },
+            },
+          },
+        },
       },
     },
   };

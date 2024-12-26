@@ -8,8 +8,10 @@ const getSummaryStatistics = async (
   request: RequestModels.DashboardRequest
 ): Promise<RM.StatisticsResponse> => {
   try {
-    const statsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
-    const createIndexName = process.env.ELASTIC_CREATE_INDEX_NAME;
+    const statsIndexName: string | undefined =
+      process.env["ELASTIC_STATS_INDEX_NAME"];
+    const createIndexName: string | undefined =
+      process.env["ELASTIC_CREATE_INDEX_NAME"];
 
     const dashboardQuery = QueryBuilder.buildDashboardQuery(
       request,
@@ -71,29 +73,29 @@ const getSummaryStatistics = async (
 
     const lifetimeStats: RM.DashboardApiStat[] = [
       {
-        key: "Total Hits",
+        key: "Total Clicks",
         value: totalHits,
-        icon: "/assets/icons/total-hits.png",
+        suffix: "clicks",
       },
       {
-        key: "Avg Redirect Duration",
+        key: "Average Redirect Time",
         value: averageRedirectDuration
-          ? `${averageRedirectDuration.toFixed(2)} ms`
-          : `0 ms`,
-        icon: "/assets/icons/clock.png",
+          ? `${averageRedirectDuration.toFixed(2)}`
+          : 0,
+        suffix: "ms",
       },
     ];
 
     const currentDayStats: RM.DashboardApiStat[] = [
       {
-        key: "Total Hits",
+        key: "Current Day",
         value: currentDayHitsCount,
-        icon: "/assets/icons/total-hits.png",
+        suffix: "clicks",
       },
       {
-        key: "New Links",
+        key: "Current Day",
         value: currentDayUrlsCreated,
-        icon: "/assets/icons/add-link.png",
+        suffix: "links",
       },
     ];
 
@@ -187,6 +189,8 @@ const getPopularUrlsStatistics = async (
         const url: RM.PopularUrlKey = {
           short_url: popularUrl.key,
           hits_count: popularUrl.doc_count,
+          original_url:
+            popularUrl.original_url?.hits?.hits[0]?._source?.originalUrl,
         };
         urls.push(url);
       }
@@ -198,6 +202,8 @@ const getPopularUrlsStatistics = async (
 
     return Promise.resolve(popularUrlResponse);
   } catch (error: any) {
+    console.log(error);
+
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
       errors: ["Internal Server Error"],
