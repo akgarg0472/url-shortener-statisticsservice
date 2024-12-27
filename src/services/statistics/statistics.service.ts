@@ -1,8 +1,14 @@
+import { basename, dirname } from "path";
+import { getLogger } from "../../logger/logger";
 import * as EM from "../../model/elastic.models";
 import * as RequestModels from "../../model/request.models";
 import * as RM from "../../model/response.models";
 import { multiSearch, searchDocuments } from "../elastic/elastic.service";
 import * as QueryBuilder from "./queryBuilder.service";
+
+const logger = getLogger(
+  `${basename(dirname(__filename))}/${basename(__filename)}`
+);
 
 const getSummaryStatistics = async (
   request: RequestModels.DashboardRequest
@@ -109,7 +115,9 @@ const getSummaryStatistics = async (
     };
 
     return response;
-  } catch (err) {
+  } catch (err: any) {
+    logger.error(`Error fetching summary stats: ${err}`);
+
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
       errors: ["Internal Server Error"],
@@ -155,7 +163,9 @@ const getGeneratedShortUrls = async (
     };
 
     return response;
-  } catch (error) {
+  } catch (error: any) {
+    logger.error(`Error fetching generated short URLs: ${error}`);
+
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
       errors: ["Internal Server Error"],
@@ -202,7 +212,7 @@ const getPopularUrlsStatistics = async (
 
     return Promise.resolve(popularUrlResponse);
   } catch (error: any) {
-    console.log(error);
+    logger.error(`Error fetching popular URLs: ${error}`);
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
@@ -268,6 +278,8 @@ const getUrlStatistics = async (
 
     return response;
   } catch (error: any) {
+    logger.error(`Error fetching URL statistics: ${error}`);
+
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
       errors: ["Internal Server Error"],
@@ -348,7 +360,9 @@ const getDeviceMetricsStatistics = async (
     };
 
     return Promise.resolve(response);
-  } catch (error) {
+  } catch (error: any) {
+    logger.error(`Error fetching device metrics: ${error}`);
+
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
       errors: ["Internal Server Error"],
@@ -424,7 +438,9 @@ const getGeographyMetricsStatistics = async (
     };
 
     return response;
-  } catch (error) {
+  } catch (error: any) {
+    logger.error(`Error fetching geometric metrics: ${error}`);
+
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
       errors: ["Internal Server Error"],

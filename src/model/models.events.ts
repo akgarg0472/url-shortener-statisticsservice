@@ -5,7 +5,7 @@ enum EventType {
   URL_GET_SUCCESS = "URL_GET_SUCCESS",
 }
 
-interface UrlCreateStatisticsEvent {
+type UrlCreateStatisticsEvent = {
   requestId: any;
   eventType: string;
   shortUrl: string;
@@ -17,9 +17,9 @@ interface UrlCreateStatisticsEvent {
   timestamp: number;
   deviceInfo: DeviceInfo;
   geoLocation: GeoLocationInfo;
-}
+};
 
-interface UrlFetchStatisticsEvent {
+type UrlFetchStatisticsEvent = {
   requestId: any;
   eventType: string;
   shortUrl: string;
@@ -30,26 +30,26 @@ interface UrlFetchStatisticsEvent {
   eventDuration: number;
   timestamp: number;
   geoLocation: GeoLocationInfo;
-}
+};
 
-interface DeviceInfo {
+type DeviceInfo = {
   os: string;
   browser: string;
-}
+};
 
-interface UrlMetadata {
+type UrlMetadata = {
   shortUrl: string;
   originalUrl: string;
-}
+};
 
-interface GeoLocationInfo {
+type GeoLocationInfo = {
   continent: string;
   country: string;
   city: string;
   lat: number;
   lon: number;
   timezone: string;
-}
+};
 
 export {
   DeviceInfo,

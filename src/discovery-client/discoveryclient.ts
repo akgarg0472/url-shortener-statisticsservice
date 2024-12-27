@@ -1,4 +1,10 @@
 import { Eureka } from "eureka-js-client";
+import { basename, dirname } from "path";
+import { getLogger } from "../logger/logger";
+
+const logger = getLogger(
+  `${basename(dirname(__filename))}/${basename(__filename)}`
+);
 
 let eurekaClient: Eureka;
 
@@ -17,9 +23,9 @@ const initDiscoveryClient = () => {
 const destroyDiscoveryClient = () => {
   try {
     eurekaClient.stop();
-    console.info("Eureka Discovery Client disconnected");
+    logger.info("Eureka Discovery Client disconnected");
   } catch (err) {
-    console.error(`Error closing discovery server: ${err}`);
+    logger.error(`Error closing discovery server: ${err}`);
   }
 };
 

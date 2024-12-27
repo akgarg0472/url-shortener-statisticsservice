@@ -1,6 +1,12 @@
 import { City, Reader, ReaderModel } from "@maxmind/geoip2-node";
 import { readFileSync } from "fs";
+import { basename, dirname } from "path";
+import { getLogger } from "../../logger/logger";
 import { GeoLocationInfo } from "../../model/models.events";
+
+const logger = getLogger(
+  `${basename(dirname(__filename))}/${basename(__filename)}`
+);
 
 let geoLocationDatabaseReader: ReaderModel;
 
@@ -24,7 +30,7 @@ const getGeoLocation = (ip: string): GeoLocationInfo => {
 
     return location;
   } catch (error: any) {
-    console.error(error);
+    logger.error(`Error fetching geolocation for ip=${ip}: ${error}`);
 
     return {
       city: "unidentified",

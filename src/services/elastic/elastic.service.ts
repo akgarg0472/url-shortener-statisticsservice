@@ -3,8 +3,13 @@ import {
   AggregationsAggregate,
   SearchResponse,
 } from "@elastic/elasticsearch/lib/api/types";
+import { basename, dirname } from "path";
 import getElasticClient from "../../configs/elastic.configs";
-import { StatisticsEvent } from "../../model/kafka.models";
+import { getLogger } from "../../logger/logger";
+
+const logger = getLogger(
+  `${basename(dirname(__filename))}/${basename(__filename)}`
+);
 
 let elasticClient: Client;
 
@@ -17,7 +22,7 @@ const initElasticClient = async () => {
       elasticClient = client;
     })
     .catch((err) => {
-      console.error("Elasticsearch is down!", err);
+      logger.error(`Elasticsearch is down: ${err}`);
     });
 
   const createIndexName: string =
@@ -32,9 +37,9 @@ const initElasticClient = async () => {
 const destroyElasticClient = async () => {
   try {
     await elasticClient.close();
-    console.info("Disconnected from ELK");
+    logger.info("Disconnected from ELK");
   } catch (err) {
-    console.error("Error disconnecting ELK", err);
+    logger.error(`Error disconnecting ELK: ${err}`);
   }
 };
 
@@ -42,16 +47,16 @@ const _createIndex = (indexName: string) => {
   elasticClient.indices
     .create({ index: indexName })
     .then((res) => {
-      console.log(`Created index ${indexName}...: ${res.acknowledged}`);
+      logger.info(`Created index ${indexName}...: ${res.acknowledged}`);
     })
     .catch((err) => {
       const status = err.meta?.body?.status;
       const error = err.meta?.body?.error?.type;
 
       if (status === 400 && error === "resource_already_exists_exception") {
-        console.error(`Elastic index '${indexName}' already exists...`);
+        logger.warn(`Elastic index '${indexName}' already exists...`);
       } else {
-        console.error(err);
+        logger.error(err);
       }
     });
 };
@@ -88,8 +93,8 @@ const pushEventToElastic = async (indexName: string, event: any) => {
 };
 
 export {
-  initElasticClient,
   destroyElasticClient,
+  initElasticClient,
   multiSearch,
   pushEventToElastic,
   searchDocuments,

@@ -5,7 +5,7 @@ enum EventType {
   URL_GET_FAILED = "URL_GET_FAILED",
 }
 
-interface StatisticsEvent {
+type StatisticsEvent = {
   requestId: any;
   eventType: EventType;
   shortUrl: string;
@@ -16,6 +16,6 @@ interface StatisticsEvent {
   createdAt: number;
   eventDuration: number;
   timestamp: number;
-}
+};
 
 export { EventType, StatisticsEvent };

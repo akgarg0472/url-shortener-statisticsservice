@@ -1,4 +1,6 @@
 import dotenv from "dotenv";
+dotenv.config();
+
 import app from "./app";
 import {
   destroyDiscoveryClient,
@@ -11,17 +13,21 @@ import {
 import { initKafkaConsumer } from "./services/kafka/kafka.service";
 import { disconnectKafkaConsumer } from "./configs/kafka.configs";
 import { initGeoLocation } from "./services/geolocation/geolocation.service";
+import { getLogger } from "./logger/logger";
+import { basename, dirname } from "path";
 
-dotenv.config();
+const logger = getLogger(
+  `${basename(dirname(__filename))}/${basename(__filename)}`
+);
 
-const port: any = process.env.SERVER_PORT || 7979;
+const port: any = process.env["SERVER_PORT"] || 7979;
 
 const server = app.listen(port, () => {
   initDiscoveryClient();
   initElasticClient();
   initKafkaConsumer();
   initGeoLocation();
-  console.log(`Server is listening on: ${JSON.stringify(server.address())}`);
+  logger.info(`Server is listening on: ${JSON.stringify(server.address())}`);
 });
 
 const doCleanup = async () => {
@@ -29,8 +35,8 @@ const doCleanup = async () => {
     destroyDiscoveryClient();
     await destroyElasticClient();
     await disconnectKafkaConsumer();
-  } catch (err) {
-    console.error(`Error cleaning up resources: ${err}`);
+  } catch (err: any) {
+    logger.error(`Error cleaning up resources: ${err}`);
   } finally {
     process.exit(0);
   }

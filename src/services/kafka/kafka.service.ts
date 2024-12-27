@@ -1,13 +1,19 @@
 import { EachMessageHandler, KafkaMessage } from "kafkajs";
+import { basename, dirname } from "path";
 import { initKafkaWithTopicAndMessageHandler } from "../../configs/kafka.configs";
+import { getLogger } from "../../logger/logger";
 import { EventType, StatisticsEvent } from "../../model/kafka.models";
-import { pushEventToElastic } from "../elastic/elastic.service";
 import {
   UrlCreateStatisticsEvent,
   UrlFetchStatisticsEvent,
 } from "../../model/models.events";
+import { pushEventToElastic } from "../elastic/elastic.service";
 import { getGeoLocation } from "../geolocation/geolocation.service";
 import { getDeviceInfo } from "../ua/useragent.service";
+
+const logger = getLogger(
+  `${basename(dirname(__filename))}/${basename(__filename)}`
+);
 
 const initKafkaConsumer = async () => {
   const topicName: string =
@@ -36,7 +42,7 @@ const onMessage = (message: KafkaMessage) => {
   );
 
   if (!indexName) {
-    console.error(`Invalid index name for event push: ${indexName}`);
+    logger.error(`Invalid index name for event push: ${indexName}`);
     return;
   }
 

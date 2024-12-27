@@ -1,66 +1,66 @@
-interface PopularUrlResponseKey {
+type PopularUrlResponseKey = {
   key: string;
   doc_count: number;
   original_url: any;
-}
+};
 
-interface Browser {
+type Browser = {
   key: string;
   doc_count: number;
-}
+};
 
-interface OSBrowser {
+type OSBrowser = {
   buckets: Browser[];
-}
+};
 
-interface DeviceMetricResponseKey {
+type DeviceMetricResponseKey = {
   key: string;
   doc_count: number;
   os_browsers: OSBrowser;
-}
+};
 
-interface GeoCity {
+type GeoCity = {
   key: string;
   doc_count: number;
-}
+};
 
-interface GeoCityKey {
+type GeoCityKey = {
   buckets: GeoCity[];
-}
+};
 
-interface GeoCountry {
+type GeoCountry = {
   key: string;
   doc_count: number;
   cities?: GeoCityKey;
-}
+};
 
-interface GeoCountryKey {
+type GeoCountryKey = {
   buckets: GeoCountry[];
-}
+};
 
-interface GeoContinentAgg {
+type GeoContinentAgg = {
   key: string;
   doc_count: number;
   countries?: GeoCountryKey;
-}
+};
 
-interface GeneratedUrlResp {
+type GeneratedUrlResp = {
   total: {
     value: number;
   };
   hits: EURL[];
-}
+};
 
-interface EURL {
+type EURL = {
   _source: {
     originalUrl: string;
     shortUrl: string;
     createdAt: number;
     ipAddress: string;
   };
-}
+};
 
-interface LatestHitsResp {
+type LatestHitsResp = {
   _source: {
     ipAddress: string;
     eventDuration: number;
@@ -75,11 +75,11 @@ interface LatestHitsResp {
     timestamp: number;
     deviceInfo: { browser: string; os: string };
   };
-}
+};
 
-interface LatestHitsAggResp {
+type LatestHitsAggResp = {
   hits: LatestHitsResp[];
-}
+};
 
 export {
   DeviceMetricResponseKey,

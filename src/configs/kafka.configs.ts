@@ -4,10 +4,14 @@ import {
   ConsumerSubscribeTopics,
   EachMessageHandler,
   Kafka,
-  KafkaJSConnectionError,
-  KafkaJSNonRetriableError,
   logLevel,
 } from "kafkajs";
+import { basename, dirname } from "path";
+import { getLogger } from "../logger/logger";
+
+const logger = getLogger(
+  `${basename(dirname(__filename))}/${basename(__filename)}`
+);
 
 let kafkaConsumer: Consumer;
 
@@ -52,9 +56,9 @@ const initKafkaConsumer = async (
 const disconnectKafkaConsumer = async () => {
   try {
     await kafkaConsumer.disconnect();
-    console.log("Disconnected from kafka");
+    logger.info("Disconnected from kafka");
   } catch (err) {
-    console.log("Error while disconnecting from kafka: ", err);
+    logger.error(`Error while disconnecting from kafka: ${err}`);
   }
 };
 
@@ -66,11 +70,4 @@ const initKafkaWithTopicAndMessageHandler = async (
   await initKafkaConsumer(kafkaConsumer, topics, messageHandler);
 };
 
-const isKafkaConnectivityFailedError = (error: any): boolean => {
-  return (
-    error instanceof KafkaJSNonRetriableError &&
-    error.cause instanceof KafkaJSConnectionError
-  );
-};
-
-export { initKafkaWithTopicAndMessageHandler, disconnectKafkaConsumer };
+export { disconnectKafkaConsumer, initKafkaWithTopicAndMessageHandler };
