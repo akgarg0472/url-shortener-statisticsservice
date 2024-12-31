@@ -1,20 +1,20 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import { basename, dirname } from "path";
 import app from "./app";
+import { disconnectKafkaConsumer } from "./configs/kafka.configs";
 import {
   destroyDiscoveryClient,
   initDiscoveryClient,
 } from "./discovery-client/discoveryclient";
+import { getLogger } from "./logger/logger";
 import {
   destroyElasticClient,
   initElasticClient,
 } from "./services/elastic/elastic.service";
-import { initKafkaConsumer } from "./services/kafka/kafka.service";
-import { disconnectKafkaConsumer } from "./configs/kafka.configs";
 import { initGeoLocation } from "./services/geolocation/geolocation.service";
-import { getLogger } from "./logger/logger";
-import { basename, dirname } from "path";
+import { initKafkaConsumer } from "./services/kafka/kafka.service";
 
 const logger = getLogger(
   `${basename(dirname(__filename))}/${basename(__filename)}`

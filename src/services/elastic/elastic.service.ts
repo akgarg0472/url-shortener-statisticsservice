@@ -5,6 +5,7 @@ import {
 } from "@elastic/elasticsearch/lib/api/types";
 import { basename, dirname } from "path";
 import getElasticClient from "../../configs/elastic.configs";
+import { ElasticInitError } from "../../error/elasticError";
 import { getLogger } from "../../logger/logger";
 
 const logger = getLogger(
@@ -25,10 +26,15 @@ const initElasticClient = async () => {
       logger.error(`Elasticsearch is down: ${err}`);
     });
 
+  if (!elasticClient) {
+    logger.error("Failed to initialize ElasticSearch");
+    throw new ElasticInitError("Failed to initialize ElasticSearch");
+  }
+
   const createIndexName: string =
-    process.env.ELASTIC_CREATE_INDEX_NAME || "urlshortener-create";
+    process.env["ELASTIC_CREATE_INDEX_NAME"] || "urlshortener-create";
   const elasticStatsIndexName =
-    process.env.ELASTIC_STATS_INDEX_NAME || "urlshortener-fetch";
+    process.env["ELASTIC_STATS_INDEX_NAME"] || "urlshortener-fetch";
 
   _createIndex(createIndexName);
   _createIndex(elasticStatsIndexName);
