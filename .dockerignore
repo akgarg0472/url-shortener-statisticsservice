@@ -25,3 +25,5 @@ Dockerfile
 *.tmp
 *.swp
 *.swo
+
+nodemon.json

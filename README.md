@@ -174,7 +174,7 @@ This approach simplifies the configuration by loading all environment variables 
 
 ## API Documentation
 
-The **API Documentation** for the URL Shortener Profile Service is automatically generated using **Springdoc OpenAPI**
+The **API Documentation** for the URL Shortener Profile Service is automatically generated using **Swagger OpenAPI**
 and can be accessed at the following endpoints:
 
 1. **OpenAPI Specification**: Available at:

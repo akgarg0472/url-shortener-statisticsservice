@@ -1,0 +1,6 @@
+{
+  "watch": ["src", ".env", ".json", "swagger.yml"],
+  "ext": "ts",
+  "ignore": ["src/**/*.spec.ts"],
+  "exec": "npm run compile && clear && clear && npm run dev "
+}

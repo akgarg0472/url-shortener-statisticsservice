@@ -7,10 +7,11 @@
   "bin": "dist/statisticsService.js",
   "scripts": {
     "clean": "rimraf dist && rimraf binary",
-    "compile": "npm run clean && npm run tsc && npm run minify",
+    "postbuild": "copyfiles -u 1 src/swagger.yml dist/",
+    "compile": "npm run clean && npm run tsc && npm run minify && npm run postbuild",
     "tsc": "tsc",
     "build": "npm run compile && npm run package",
-    "package": "pkg . --compress=Gzip",
+    "package": "npm run compile && pkg . --compress=Gzip && copyfiles -u 1 src/swagger.yml binary/",
     "dev": "clear && node dist/statisticsService.js",
     "minify": "find dist -name '*.js' -exec terser {} --output {} --compress --mangle --comments=false --toplevel \\;",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -36,9 +37,12 @@
     "eureka-js-client": "^4.5.0",
     "express": "^4.18.2",
     "kafkajs": "^2.2.4",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.1",
     "ua-parser-js": "^1.0.38",
     "winston": "^3.17.0",
-    "winston-daily-rotate-file": "^5.0.0"
+    "winston-daily-rotate-file": "^5.0.0",
+    "yaml": "^2.7.0"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.2",
@@ -46,10 +50,12 @@
     "@types/eureka-js-client": "^4.5.5",
     "@types/express": "^4.17.17",
     "@types/node": "^20.5.1",
+    "@types/swagger-ui-express": "^4.1.7",
     "@types/ua-parser-js": "^0.7.39",
+    "copyfiles": "^2.4.1",
     "rimraf": "^5.0.5",
-    "ts-node": "^10.9.1",
     "terser": "^5.37.0",
+    "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   }
 }

@@ -1,0 +1,635 @@
+openapi: "3.0.0"
+
+info:
+  title: "URL Shortener Statistics API"
+  version: "1.0.0"
+  description: |
+    This is the API documentation for the Statistics Service of a URL shortener platform.
+    The API exposes statistics related to shortened URLs, such as health, dashboard summary,
+    popular URLs, device metrics, geographical data, and more.
+
+servers:
+  - url: "STATS_API_SERVER_URL"
+
+paths:
+  /ping:
+    get:
+      summary: "Ping the server"
+      description: "Check if the server is up and running by pinging this endpoint."
+      tags:
+        - "Health"
+      responses:
+        "200":
+          description: "A response indicating the server is alive and responding."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status_code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "PONG"
+                  params:
+                    type: object
+                    properties:
+                      ip:
+                        type: string
+                        description: "The client's IP address"
+                        example: "192.168.1.1"
+
+  /health:
+    get:
+      summary: "Check the health of the server"
+      description: "Returns a response indicating that the server is up and running."
+      tags:
+        - "Health"
+      responses:
+        "200":
+          description: "Server is alive and running."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status_code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "Server is UP and running"
+                  params:
+                    type: object
+                    properties:
+                      ip:
+                        type: string
+                        description: "The client's IP address"
+                        example: "192.168.1.1"
+
+  /docs:
+    get:
+      summary: "Swagger UI Documentation"
+      description: "This endpoint serves the Swagger UI for the Statistics API documentation."
+      tags:
+        - "Documentation"
+      responses:
+        "200":
+          description: "The Swagger UI for the Statistics API."
+          content:
+            text/html:
+              schema:
+                type: string
+                example: "<html>...</html>"
+
+  /api-docs:
+    get:
+      tags:
+        - Documentation
+      summary: "Get raw Swagger JSON data"
+      description: "Fetches the raw Swagger JSON data for the Statistics API documentation."
+      responses:
+        "200":
+          description: "Raw Swagger JSON data"
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Swagger JSON data"
+
+  /api/v1/statistics/dashboard-summary:
+    get:
+      summary: "Get Dashboard Summary"
+      description: "Fetches the summary statistics for the dashboard, including lifetime and current day statistics."
+      tags:
+        - "Statistics-v1"
+      parameters:
+        - name: "userId"
+          in: "query"
+          required: true
+          description: "User ID"
+          schema:
+            type: string
+        - name: "startTime"
+          in: "query"
+          required: true
+          description: "Start time for the statistics range"
+          schema:
+            type: integer
+        - name: "endTime"
+          in: "query"
+          required: true
+          description: "End time for the statistics range"
+          schema:
+            type: integer
+        - name: "currentDayStartTime"
+          in: "query"
+          required: true
+          description: "Start time of the current day"
+          schema:
+            type: integer
+        - name: "currentTime"
+          in: "query"
+          required: true
+          description: "Current time"
+          schema:
+            type: integer
+        - name: "oneWeekOldTime"
+          in: "query"
+          required: true
+          description: "Time one week ago"
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Dashboard summary statistics successfully fetched"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardResponse"
+        "400":
+          description: "Invalid query parameters or request body"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/statistics/generated-urls:
+    get:
+      summary: "Get Generated Short URLs"
+      description: "Fetches a list of generated short URLs with pagination support."
+      tags:
+        - "Statistics-v1"
+      parameters:
+        - name: "userId"
+          in: "query"
+          required: true
+          description: "User ID"
+          schema:
+            type: string
+        - name: "limit"
+          in: "query"
+          required: true
+          description: "Number of URLs to fetch"
+          schema:
+            type: integer
+        - name: "offset"
+          in: "query"
+          required: true
+          description: "Offset to paginate results"
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Successfully fetched the list of generated short URLs"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneratedShortUrlsResponse"
+        "400":
+          description: "Invalid query parameters or request body"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/statistics/popular-urls:
+    get:
+      summary: "Get Popular URLs"
+      description: "Fetches the most popular URLs based on user statistics between the given time range."
+      tags:
+        - "Statistics-v1"
+      parameters:
+        - name: "userId"
+          in: "query"
+          required: true
+          description: "User ID"
+          schema:
+            type: string
+        - name: "startTime"
+          in: "query"
+          required: true
+          description: "Start time of the period to fetch statistics"
+          schema:
+            type: integer
+            format: int64
+        - name: "endTime"
+          in: "query"
+          required: true
+          description: "End time of the period to fetch statistics"
+          schema:
+            type: integer
+            format: int64
+        - name: "sortOrder"
+          in: "query"
+          required: false
+          description: "Order to sort the popular URLs (asc/desc)"
+          schema:
+            type: string
+            enum:
+              - "asc"
+              - "desc"
+      responses:
+        "200":
+          description: "Successfully fetched the list of popular URLs"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PopularUrlStatisticsResponse"
+        "400":
+          description: "Invalid query parameters or request body"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/statistics/url-metrics:
+    get:
+      summary: "Get URL Metrics"
+      description: "Fetches metrics related to a specific URL, such as hit counts and redirection durations."
+      tags:
+        - "Statistics-v1"
+      parameters:
+        - name: "userId"
+          in: "query"
+          required: true
+          description: "User ID"
+          schema:
+            type: string
+        - name: "shortUrl"
+          in: "query"
+          required: true
+          description: "Short URL for which to fetch metrics"
+          schema:
+            type: string
+        - name: "startTime"
+          in: "query"
+          required: true
+          description: "Start time for the period to fetch URL metrics"
+          schema:
+            type: integer
+            format: int64
+        - name: "limit"
+          in: "query"
+          required: true
+          description: "Limit for the number of records to return"
+          schema:
+            type: integer
+        - name: "endTime"
+          in: "query"
+          required: true
+          description: "End time for the period to fetch URL metrics"
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "Successfully fetched URL metrics"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UrlStatisticsResponse"
+        "400":
+          description: "Invalid query parameters or request body"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/statistics/device-metrics:
+    get:
+      summary: "Get Device Metrics"
+      description: "Fetches metrics related to devices accessing the URLs, such as operating systems and browsers."
+      tags:
+        - "Statistics-v1"
+      parameters:
+        - name: "userId"
+          in: "query"
+          required: true
+          description: "User ID"
+          schema:
+            type: string
+        - name: "startTime"
+          in: "query"
+          required: true
+          description: "Start time for the period to fetch device metrics"
+          schema:
+            type: integer
+            format: int64
+        - name: "endTime"
+          in: "query"
+          required: true
+          description: "End time for the period to fetch device metrics"
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "Successfully fetched device metrics"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceMetricsResponse"
+        "400":
+          description: "Invalid query parameters or request body"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/statistics/geographical-metrics:
+    get:
+      summary: "Get Geographical Metrics"
+      description: "Fetches geographical statistics related to shortened URLs, such as hits from different continents and countries."
+      tags:
+        - "Statistics-v1"
+      parameters:
+        - name: "userId"
+          in: "query"
+          required: true
+          description: "User ID"
+          schema:
+            type: string
+        - name: "startTime"
+          in: "query"
+          required: true
+          description: "Start time for the period to fetch geographical metrics"
+          schema:
+            type: integer
+            format: int64
+        - name: "endTime"
+          in: "query"
+          required: true
+          description: "End time for the period to fetch geographical metrics"
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "Successfully fetched geographical metrics"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeographicalStatisticsResponse"
+        "400":
+          description: "Invalid query parameters or request body"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    DashboardResponse:
+      type: object
+      properties:
+        status_code:
+          type: integer
+          example: 200
+        lifetime_stats:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardApiStat"
+        current_day_stats:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardApiStat"
+        countries:
+          type: array
+          items:
+            $ref: "#/components/schemas/CountryKey"
+        continents:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContinentKey"
+        prev_seven_days_hits:
+          type: array
+          items:
+            $ref: "#/components/schemas/PerDayHitStats"
+    DashboardApiStat:
+      type: object
+      properties:
+        key:
+          type: string
+          example: "Total Hits"
+        value:
+          type: integer
+          example: 10000
+        suffix:
+          type: string
+          example: "hits"
+    ErrorResponse:
+      type: object
+      properties:
+        status_code:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: "Bad Request"
+        errors:
+          type: array
+          items:
+            type: string
+          example: ["Missing required parameters"]
+    CountryKey:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "USA"
+        hits_count:
+          type: integer
+          example: 1500
+    ContinentKey:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "North America"
+        hits_count:
+          type: integer
+          example: 5000
+    PerDayHitStats:
+      type: object
+      properties:
+        timestamp:
+          type: integer
+          example: 1632105600
+        hits:
+          type: integer
+          example: 100
+    GeneratedShortUrlsResponse:
+      type: object
+      properties:
+        status_code:
+          type: integer
+          example: 200
+        total_records:
+          type: integer
+          example: 100
+        next_offset:
+          type: integer
+          example: 50
+        urls:
+          type: array
+          items:
+            $ref: "#/components/schemas/UrlMetadata"
+    UrlMetadata:
+      type: object
+      properties:
+        original_url:
+          type: string
+          example: "https://www.example.com"
+        short_url:
+          type: string
+          example: "http://short.url/abc123"
+        created_at:
+          type: string
+          format: date-time
+          example: "2022-01-01T12:00:00Z"
+        ip_address:
+          type: string
+          example: "192.168.1.1"
+    PopularUrlStatisticsResponse:
+      type: object
+      properties:
+        status_code:
+          type: integer
+          example: 200
+        popular_urls:
+          type: array
+          items:
+            $ref: "#/components/schemas/PopularUrlKey"
+    PopularUrlKey:
+      type: object
+      properties:
+        short_url:
+          type: string
+          example: "http://short.url/abc123"
+        hits_count:
+          type: integer
+          example: 150
+        original_url:
+          type: string
+          example: "https://www.example.com"
+    UrlStatisticsResponse:
+      type: object
+      properties:
+        status_code:
+          type: integer
+          example: 200
+        total_hits:
+          type: integer
+          example: 1200
+        avg_redirect_duration:
+          type: string
+          example: "2.5s"
+        latest_hits:
+          type: array
+          items:
+            $ref: "#/components/schemas/LatestHit"
+    LatestHit:
+      type: object
+      properties:
+        ip:
+          type: string
+          example: "192.168.1.1"
+        redirect_duration:
+          type: integer
+          example: 3
+        timestamp:
+          type: integer
+          example: 1620073440000
+        device_info:
+          type: object
+          properties:
+            browser:
+              type: string
+              example: "Chrome"
+            os:
+              type: string
+              example: "Windows 10"
+        location:
+          type: object
+          properties:
+            country:
+              type: string
+              example: "United States"
+            timezone:
+              type: string
+              example: "PST"
+    DeviceMetricsResponse:
+      type: object
+      properties:
+        status_code:
+          type: integer
+          example: 200
+        os_browsers:
+          type: array
+          items:
+            $ref: "#/components/schemas/OsBrowserKey"
+        browsers:
+          type: array
+          items:
+            $ref: "#/components/schemas/BrowserKey"
+        oss:
+          type: array
+          items:
+            $ref: "#/components/schemas/OSKey"
+    OsBrowserKey:
+      type: object
+      properties:
+        os_name:
+          type: string
+          example: "Windows 10"
+        hits_count:
+          type: integer
+          example: 500
+        browsers:
+          type: array
+          items:
+            $ref: "#/components/schemas/BrowserKey"
+    BrowserKey:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Chrome"
+        hits_count:
+          type: integer
+          example: 300
+    OSKey:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Windows"
+        hits_count:
+          type: integer
+          example: 700
+    GeographicalStatisticsResponse:
+      type: object
+      properties:
+        status_code:
+          type: integer
+          example: 200
+        continents:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContinentKey"
+        countries:
+          type: array
+          items:
+            $ref: "#/components/schemas/CountryKey"
+    CityKey:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "New York"
+        hits_count:
+          type: integer
+          example: 1500

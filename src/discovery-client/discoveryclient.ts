@@ -1,6 +1,7 @@
 import { Eureka } from "eureka-js-client";
 import { basename, dirname } from "path";
 import { getLogger } from "../logger/logger";
+import { getHostName, getLocalIPAddress } from "../utils/networkUtils";
 
 const logger = getLogger(
   `${basename(dirname(__filename))}/${basename(__filename)}`
@@ -30,18 +31,21 @@ const destroyDiscoveryClient = () => {
 };
 
 const getEurekaClient = (): Eureka => {
+  const hostIp = getLocalIPAddress();
+  const hostName = getHostName();
+
   const client = new Eureka({
     instance: {
       app: "urlshortener-statistics-service",
-      hostName: "localhost",
-      ipAddr: "127.0.0.1",
+      hostName: hostName,
+      ipAddr: hostIp,
       port: {
         $: getApplicationPort(),
         "@enabled": true,
       },
       vipAddress: "urlshortener-statistics-service",
       secureVipAddress: "urlshortener-statistics-service",
-      statusPageUrl: `http://localhost:${getApplicationPort()}/info`,
+      statusPageUrl: `http://${hostIp}:${getApplicationPort()}/info`,
       dataCenterInfo: {
         name: "MyOwn",
         "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
@@ -79,4 +83,4 @@ const getEurekaServerHost = (): string => {
   return process.env.EUREKA_SERVER_HOST || "127.0.0.1";
 };
 
-export { initDiscoveryClient, destroyDiscoveryClient };
+export { destroyDiscoveryClient, initDiscoveryClient };
