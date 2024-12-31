@@ -113,7 +113,6 @@ interface GeneratedShortUrlsResponse extends StatisticsResponse {
 }
 
 export {
-  PingResponse,
   BrowserKey,
   CityKey,
   ContinentKey,
@@ -125,9 +124,10 @@ export {
   GeneratedShortUrlsResponse,
   GeographicalStatisticsResponse,
   LatestHit,
-  OSKey,
   OsBrowserKey,
+  OSKey,
   PerDayHitStats,
+  PingResponse,
   PopularUrlKey,
   PopularUrlStatisticsResponse,
   StatisticsResponse,

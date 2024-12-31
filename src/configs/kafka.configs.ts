@@ -18,7 +18,7 @@ const logger = getLogger(
 let kafkaConsumer: Consumer | null = null;
 
 const createKafkaConsumer = (
-  brokersUrl: string[] = ["localhost:9092"],
+  brokersUrl: string[],
   loggingLevel: logLevel = logLevel.ERROR
 ): Consumer => {
   const kafka: Kafka = new Kafka({
@@ -80,7 +80,10 @@ const initKafkaWithTopicAndMessageHandler = async (
   topics: string[],
   messageHandler: EachMessageHandler
 ) => {
-  kafkaConsumer = createKafkaConsumer();
+  const brokersUrl = process.env["KAFKA_BROKER_URLS"]?.split(",") || [
+    "localhost:9092",
+  ];
+  kafkaConsumer = createKafkaConsumer(brokersUrl);
   await initKafkaConsumer(kafkaConsumer, topics, messageHandler);
 };
 

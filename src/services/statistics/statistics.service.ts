@@ -3,6 +3,7 @@ import { getLogger } from "../../logger/logger";
 import * as EM from "../../model/elastic.models";
 import * as RequestModels from "../../model/request.models";
 import * as RM from "../../model/response.models";
+import * as cacheService from "../cache/cache.service";
 import { multiSearch, searchDocuments } from "../elastic/elastic.service";
 import * as QueryBuilder from "./queryBuilder.service";
 
@@ -14,6 +15,12 @@ const getSummaryStatistics = async (
   request: RequestModels.DashboardRequest
 ): Promise<RM.StatisticsResponse> => {
   try {
+    const cached = await cacheService.getCachedSummaryStatistics(request);
+
+    if (cached) {
+      return cached;
+    }
+
     const statsIndexName: string | undefined =
       process.env["ELASTIC_STATS_INDEX_NAME"];
     const createIndexName: string | undefined =
@@ -114,6 +121,8 @@ const getSummaryStatistics = async (
       prev_seven_days_hits: prevSevenDaysHits,
     };
 
+    await cacheService.setCachedSummaryStatistics(request, response);
+
     return response;
   } catch (err: any) {
     logger.error(`Error fetching summary stats: ${err}`);
@@ -131,6 +140,12 @@ const getSummaryStatistics = async (
 const getGeneratedShortUrls = async (
   request: RequestModels.GeneratedShortUrlsRequest
 ): Promise<RM.StatisticsResponse> => {
+  const cached = await cacheService.getCachedGeneratedShortUrls(request);
+
+  if (cached) {
+    return cached;
+  }
+
   try {
     const query = QueryBuilder.buildGeneratedShortUrlsQuery(request);
     const elasticCreateIndexName = process.env.ELASTIC_CREATE_INDEX_NAME;
@@ -162,6 +177,8 @@ const getGeneratedShortUrls = async (
       urls: __urls,
     };
 
+    await cacheService.setCachedGeneratedShortUrls(request, response);
+
     return response;
   } catch (error: any) {
     logger.error(`Error fetching generated short URLs: ${error}`);
@@ -179,6 +196,12 @@ const getGeneratedShortUrls = async (
 const getPopularUrlsStatistics = async (
   request: RequestModels.PopularUrlsRequest
 ): Promise<RM.StatisticsResponse> => {
+  const cached = await cacheService.getCachedPopularUrls(request);
+
+  if (cached) {
+    return cached;
+  }
+
   try {
     const popularUrlQuery = QueryBuilder.buildPopularUrlQuery(request);
     const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
@@ -210,7 +233,9 @@ const getPopularUrlsStatistics = async (
       popular_urls: urls,
     };
 
-    return Promise.resolve(popularUrlResponse);
+    await cacheService.setCachedPopularUrls(request, popularUrlResponse);
+
+    return popularUrlResponse;
   } catch (error: any) {
     logger.error(`Error fetching popular URLs: ${error}`);
 
@@ -227,6 +252,12 @@ const getPopularUrlsStatistics = async (
 const getUrlStatistics = async (
   request: RequestModels.UrlMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
+  const cached = await cacheService.getCachedUrlStatistics(request);
+
+  if (cached) {
+    return cached;
+  }
+
   try {
     const urlStatsQuery = QueryBuilder.buildUrlStatsQuery(request);
     const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
@@ -276,6 +307,8 @@ const getUrlStatistics = async (
       latest_hits: __latestHits,
     };
 
+    await cacheService.setCachedUrlStatistics(request, response);
+
     return response;
   } catch (error: any) {
     logger.error(`Error fetching URL statistics: ${error}`);
@@ -293,6 +326,12 @@ const getUrlStatistics = async (
 const getDeviceMetricsStatistics = async (
   request: RequestModels.DeviceMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
+  const cached = await cacheService.getCachedDeviceMetrics(request);
+
+  if (cached) {
+    return cached;
+  }
+
   try {
     const deviceMetricsQuery = QueryBuilder.buildDeviceMetricsQuery(request);
     const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
@@ -359,7 +398,9 @@ const getDeviceMetricsStatistics = async (
       oss: __operatingSystems,
     };
 
-    return Promise.resolve(response);
+    await cacheService.setCachedDeviceMetrics(request, response);
+
+    return response;
   } catch (error: any) {
     logger.error(`Error fetching device metrics: ${error}`);
 
@@ -376,6 +417,12 @@ const getDeviceMetricsStatistics = async (
 const getGeographyMetricsStatistics = async (
   request: RequestModels.GeographicalMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
+  const cached = await cacheService.getCachedGeographyMetrics(request);
+
+  if (cached) {
+    return cached;
+  }
+
   try {
     const geographicaQuery = QueryBuilder.buildGeographicalQuery(request);
     const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
@@ -437,9 +484,11 @@ const getGeographyMetricsStatistics = async (
       countries: __countries,
     };
 
+    await cacheService.setCachedGeographicMetrics(request, response);
+
     return response;
   } catch (error: any) {
-    logger.error(`Error fetching geometric metrics: ${error}`);
+    logger.error(`Error fetching geography metrics: ${error}`);
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,

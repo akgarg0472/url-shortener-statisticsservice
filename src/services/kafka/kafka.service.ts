@@ -17,7 +17,7 @@ const logger = getLogger(
 
 const initKafkaConsumer = async () => {
   const topicName: string =
-    process.env.KAFKA_TOPIC_NAME || "urlshortener-statistics-events";
+    process.env["KAFKA_TOPIC_NAME"] || "urlshortener-statistics-events";
   initKafkaWithTopicAndMessageHandler([topicName], kafkaMessageHandler);
 };
 
@@ -95,12 +95,12 @@ const determineElasticIndexName = (eventType: EventType): string | null => {
     eventType === EventType.URL_CREATE_SUCCESS ||
     eventType === EventType.URL_CREATE_FAILED
   ) {
-    return process.env.ELASTIC_CREATE_INDEX_NAME || "urlshortener-create";
+    return process.env["ELASTIC_CREATE_INDEX_NAME"] || "urlshortener.create";
   } else if (
     eventType === EventType.URL_GET_SUCCESS ||
     eventType === EventType.URL_GET_FAILED
   ) {
-    return process.env.ELASTIC_STATS_INDEX_NAME || "urlshortener-fetch";
+    return process.env["ELASTIC_STATS_INDEX_NAME"] || "urlshortener.fetch";
   } else {
     return null;
   }

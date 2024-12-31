@@ -10,7 +10,7 @@ interface PopularUrlsRequest extends _StatisticsRequest {
 }
 
 interface DeviceMetricsRequest extends _StatisticsRequest {
-  shortUrl: string;
+  shortUrl?: string;
 }
 
 interface GeographicalMetricsRequest extends _StatisticsRequest {
