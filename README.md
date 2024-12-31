@@ -75,6 +75,11 @@ ELASTICSEARCH_PORT=9200
 ELASTIC_CREATE_INDEX_NAME=urlshortener.create
 ELASTIC_STATS_INDEX_NAME=urlshortener.fetch
 GEOIP_DATABASE_PATH=<path_to_geo_database>
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=1
+REDIS_TTL_DURATION_MS=60000
 ```
 
 #### General Configuration
@@ -99,7 +104,7 @@ GEOIP_DATABASE_PATH=<path_to_geo_database>
 
 - **KAFKA_TOPIC_NAME**: Kafka topic for consuming events.
 
-#### Eureka Configuration (Optional)
+#### Eureka Configuration
 
 - **EUREKA_SERVER_HOST**: Eureka server host.
 - **EUREKA_SERVER_PORT**: Eureka server port.
@@ -108,6 +113,14 @@ GEOIP_DATABASE_PATH=<path_to_geo_database>
 #### GeoIP Database Configuration
 
 - **GEOIP_DATABASE_PATH**: Path to the GeoIP database file for geo-location features.
+
+#### Redis Configuration
+
+- **REDIS_HOST**: Redis server hostname or IP address.
+- **REDIS_PORT**: Redis server port (default is `6379`).
+- **REDIS_PASSWORD**: Redis server authentication password (leave empty if not required).
+- **REDIS_DB**: The Redis database index to use (default is `0`).
+- **REDIS_TTL_DURATION_MS**: Time-to-live (TTL) in milliseconds for cache entries.
 
 ## Running the Application
 
@@ -159,6 +172,11 @@ docker run --name=urlshortener-statistics-service --network=host \
   -e ELASTIC_CREATE_INDEX_NAME=urlshortener.create \
   -e ELASTIC_STATS_INDEX_NAME=urlshortener.fetch \
   -e GEOIP_DATABASE_PATH=./geolite/GeoLite2-City.mmdb \
+  -e REDIS_HOST=localhost \
+  -e REDIS_PORT=6379 \
+  -e REDIS_PASSWORD= \
+  -e REDIS_DB=1 \
+  -e REDIS_TTL_DURATION_MS=60000 \
   akgarg0472/urlshortener-statistics-service:1.0.0
 ```
 
