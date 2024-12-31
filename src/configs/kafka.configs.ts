@@ -2,7 +2,9 @@ import {
   Consumer,
   ConsumerConfig,
   ConsumerSubscribeTopics,
+  DisconnectEvent,
   EachMessageHandler,
+  InstrumentationEvent,
   Kafka,
   logLevel,
 } from "kafkajs";
@@ -13,7 +15,7 @@ const logger = getLogger(
   `${basename(dirname(__filename))}/${basename(__filename)}`
 );
 
-let kafkaConsumer: Consumer;
+let kafkaConsumer: Consumer | null = null;
 
 const createKafkaConsumer = (
   brokersUrl: string[] = ["localhost:9092"],
@@ -29,9 +31,17 @@ const createKafkaConsumer = (
     groupId: "urlshortener-statistics-service-consumer-group",
   };
 
-  const consumer: Consumer = kafka.consumer(consumerConfig);
+  const c: Consumer = kafka.consumer(consumerConfig);
 
-  return consumer;
+  c.on("consumer.disconnect", (event: DisconnectEvent) => {
+    logger.info("Kafka consumer disconnected successfully");
+  });
+
+  c.on("consumer.stop", (_: InstrumentationEvent<null>) => {
+    logger.info("Kafka consumer stopped successfully");
+  });
+
+  return c;
 };
 
 const initKafkaConsumer = async (
@@ -55,8 +65,12 @@ const initKafkaConsumer = async (
 
 const disconnectKafkaConsumer = async () => {
   try {
+    if (!kafkaConsumer) {
+      return;
+    }
+
+    await kafkaConsumer.stop();
     await kafkaConsumer.disconnect();
-    logger.info("Disconnected from kafka");
   } catch (err) {
     logger.error(`Error while disconnecting from kafka: ${err}`);
   }
