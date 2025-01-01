@@ -12,6 +12,7 @@ import {
   destroyDiscoveryClient,
   initDiscoveryClient,
 } from "./discovery-client/discoveryclient";
+import { ElasticInitError } from "./error/elasticError";
 import { getLogger } from "./logger/logger";
 import {
   destroyElasticClient,
@@ -35,7 +36,7 @@ const server = app.listen(port, () => {
   logger.info(`Server is listening on: ${JSON.stringify(server.address())}`);
 });
 
-const doCleanup = async () => {
+export const doCleanupAndShutdown = async (exitCode: number) => {
   try {
     destroyDiscoveryClient();
     await destroyElasticClient();
@@ -44,7 +45,8 @@ const doCleanup = async () => {
   } catch (err: any) {
     logger.error(`Error cleaning up resources: ${err}`);
   } finally {
-    process.exit(0);
+    logger.info(`Terminating process with exit code: ${exitCode}`);
+    process.exit(exitCode);
   }
 };
 
@@ -56,8 +58,13 @@ process.on(
 );
 
 process.on("unhandledRejection", (reason: any, _: Promise<unknown>) => {
+  if (reason instanceof ElasticInitError) {
+    doCleanupAndShutdown(-1);
+    return;
+  }
+
   logger.error(`Unhandled rejection: ${reason}`);
 });
 
-process.on("SIGINT", doCleanup);
-process.on("SIGTERM", doCleanup);
+process.on("SIGINT", () => doCleanupAndShutdown(130));
+process.on("SIGTERM", () => doCleanupAndShutdown(143));

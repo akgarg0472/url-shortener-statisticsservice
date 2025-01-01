@@ -1,5 +1,8 @@
 export class ElasticInitError extends Error {
-  constructor(message: string) {
+  err: any;
+
+  constructor(message: string, err: any) {
     super(message);
+    this.err = err;
   }
 }

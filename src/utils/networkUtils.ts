@@ -15,7 +15,3 @@ export const getLocalIPAddress = (): string => {
 
   return ip;
 };
-
-export const getHostName = (): string => {
-  return os.hostname();
-};

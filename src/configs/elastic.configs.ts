@@ -22,23 +22,23 @@ const getElasticEndpoint = (): string => {
 };
 
 const getProtocol = (): string => {
-  return process.env.ELASTICSEARCH_PROTOCOL || "http";
+  return process.env["ELASTICSEARCH_PROTOCOL"] || "http";
 };
 
 const getHost = (): string => {
-  return process.env.ELASTICSEARCH_HOST || "localhost";
+  return process.env["ELASTICSEARCH_HOST"] || "localhost";
 };
 
 function getPort(): string {
-  return process.env.ELASTICSEARCH_PORT || "9200";
+  return process.env["ELASTICSEARCH_PORT"] || "9200";
 }
 
 const getUsername = (): string => {
-  return process.env.ELASTICSEARCH_USERNAME || "elastic";
+  return process.env["ELASTICSEARCH_USERNAME"] || "elastic";
 };
 
 const getPassword = (): string => {
-  return process.env.ELASTICSEARCH_PASSWORD || "";
+  return process.env["ELASTICSEARCH_PASSWORD"] || "";
 };
 
 export default getElasticClient;

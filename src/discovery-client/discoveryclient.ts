@@ -1,7 +1,10 @@
 import { Eureka } from "eureka-js-client";
 import { basename, dirname } from "path";
 import { getLogger } from "../logger/logger";
-import { getHostName, getLocalIPAddress } from "../utils/networkUtils";
+import { doCleanupAndShutdown } from "../statisticsService";
+import { getEnvNumber } from "../utils/envUtils";
+import { getLocalIPAddress } from "../utils/networkUtils";
+import { EurekaLogger } from "./eurekaLogger";
 
 const logger = getLogger(
   `${basename(dirname(__filename))}/${basename(__filename)}`
@@ -18,26 +21,34 @@ const initDiscoveryClient = () => {
   }
 
   eurekaClient = getEurekaClient();
-  eurekaClient.start();
+
+  eurekaClient.start((err: Error) => {
+    if (err) {
+      logger.error(`Failed to initialize Eureka Discovery client`);
+      doCleanupAndShutdown(-1);
+    }
+  });
 };
 
 const destroyDiscoveryClient = () => {
-  try {
-    eurekaClient.stop();
-    logger.info("Eureka Discovery Client disconnected");
-  } catch (err) {
-    logger.error(`Error closing discovery server: ${err}`);
+  if (!eurekaClient) {
+    return;
   }
+
+  eurekaClient.stop((err: Error) => {
+    if (err) {
+      logger.error(`Failed to stop Eureka Discovery client`);
+    }
+  });
 };
 
 const getEurekaClient = (): Eureka => {
   const hostIp = getLocalIPAddress();
-  const hostName = getHostName();
 
   const client = new Eureka({
     instance: {
       app: "urlshortener-statistics-service",
-      hostName: hostName,
+      hostName: hostIp,
       ipAddr: hostIp,
       port: {
         $: getApplicationPort(),
@@ -59,7 +70,12 @@ const getEurekaClient = (): Eureka => {
     eureka: {
       host: getEurekaServerHost(),
       port: getEurekaServerPort(),
+      registerWithEureka: true,
+      fetchRegistry: true,
+      maxRetries: getEnvNumber("EUREKA_MAX_RETRIES", 10),
+      requestRetryDelay: getEnvNumber("EUREKA_REQUEST_RETRY_DELAY_MS", 500),
     },
+    logger: EurekaLogger,
   });
 
   return client;

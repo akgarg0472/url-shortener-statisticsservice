@@ -103,7 +103,10 @@ const kafkaLogCreator = () => {
   return (entry: LogEntry) => {
     const logLevel: string = toWinstonLogLevel(entry.level);
 
-    if (logger.isLevelEnabled(logLevel)) {
+    if (
+      logger.isLevelEnabled(logLevel) &&
+      entry.log.message.split(" ").length > 1
+    ) {
       const { message, ...extra } = entry.log;
 
       logger.log({

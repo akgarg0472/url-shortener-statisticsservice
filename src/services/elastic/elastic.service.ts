@@ -12,23 +12,20 @@ const logger = getLogger(
   `${basename(dirname(__filename))}/${basename(__filename)}`
 );
 
-let elasticClient: Client;
+let elasticClient: Client | null = null;
 
-const initElasticClient = async () => {
+export const initElasticClient = async () => {
   const client: Client = getElasticClient();
 
-  await client
-    .ping()
-    .then(() => {
-      elasticClient = client;
-    })
-    .catch((err) => {
+  try {
+    await client.ping();
+    elasticClient = client;
+  } catch (err: any) {
+    if (err instanceof Error) {
       logger.error(`Elasticsearch is down: ${err}`);
-    });
+    }
 
-  if (!elasticClient) {
-    logger.error("Failed to initialize ElasticSearch");
-    throw new ElasticInitError("Failed to initialize ElasticSearch");
+    throw new ElasticInitError("Failed to initialize ElasticSearch", err);
   }
 
   const createIndexName: string =
@@ -40,7 +37,11 @@ const initElasticClient = async () => {
   _createIndex(elasticStatsIndexName);
 };
 
-const destroyElasticClient = async () => {
+export const destroyElasticClient = async () => {
+  if (!elasticClient) {
+    return;
+  }
+
   try {
     await elasticClient.close();
     logger.info("Disconnected from ELK");
@@ -49,8 +50,39 @@ const destroyElasticClient = async () => {
   }
 };
 
+export const multiSearch = async (indexName: string, request: any) => {
+  return await elasticClient?.msearch({
+    index: indexName,
+    body: request,
+  });
+};
+
+export const searchDocuments = async (
+  indexName: string,
+  request: any
+): Promise<SearchResponse<
+  unknown,
+  Record<string, AggregationsAggregate>
+> | null> => {
+  const response:
+    | SearchResponse<unknown, Record<string, AggregationsAggregate>>
+    | undefined = await elasticClient?.search({
+    index: indexName,
+    body: request,
+  });
+
+  return response ? response : null;
+};
+
+export const pushEventToElastic = async (indexName: string, event: any) => {
+  await elasticClient?.index({
+    index: indexName,
+    body: event,
+  });
+};
+
 const _createIndex = (indexName: string) => {
-  elasticClient.indices
+  elasticClient?.indices
     .create({ index: indexName })
     .then((res) => {
       logger.info(`Created index ${indexName}...: ${res.acknowledged}`);
@@ -65,43 +97,4 @@ const _createIndex = (indexName: string) => {
         logger.error(err);
       }
     });
-};
-
-const multiSearch = async (indexName: string, request: any) => {
-  const response = await elasticClient.msearch({
-    index: indexName,
-    body: request,
-  });
-
-  return response;
-};
-
-const searchDocuments = async (
-  indexName: string,
-  request: any
-): Promise<SearchResponse<unknown, Record<string, AggregationsAggregate>>> => {
-  const response: SearchResponse<
-    unknown,
-    Record<string, AggregationsAggregate>
-  > = await elasticClient.search({
-    index: indexName,
-    body: request,
-  });
-
-  return response;
-};
-
-const pushEventToElastic = async (indexName: string, event: any) => {
-  await elasticClient.index({
-    index: indexName,
-    body: event,
-  });
-};
-
-export {
-  destroyElasticClient,
-  initElasticClient,
-  multiSearch,
-  pushEventToElastic,
-  searchDocuments,
 };

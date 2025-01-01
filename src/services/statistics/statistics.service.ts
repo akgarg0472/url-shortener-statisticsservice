@@ -155,6 +155,10 @@ const getGeneratedShortUrls = async (
       query
     );
 
+    if (!searchResponse) {
+      throw new Error("Document search failed");
+    }
+
     const generatedShortUrlsResp: EM.GeneratedUrlResp =
       searchResponse.hits as EM.GeneratedUrlResp;
 
@@ -211,6 +215,10 @@ const getPopularUrlsStatistics = async (
       popularUrlQuery
     );
 
+    if (!searchResponse) {
+      throw new Error("Document search failed");
+    }
+
     const topUrlsAggregation: EM.PopularUrlResponseKey[] = (
       searchResponse.aggregations?.top_popular_urls as any
     ).buckets;
@@ -266,6 +274,10 @@ const getUrlStatistics = async (
       elasticStatsIndexName!,
       urlStatsQuery
     );
+
+    if (!searchResponse) {
+      throw new Error("Document search failed");
+    }
 
     const totalHitsCount = (
       searchResponse.aggregations?.total_hits_count as any
@@ -340,6 +352,10 @@ const getDeviceMetricsStatistics = async (
       elasticStatsIndexName!,
       deviceMetricsQuery
     );
+
+    if (!searchResponse) {
+      throw new Error("Document search failed");
+    }
 
     const deviceMetricsAggregation: EM.DeviceMetricResponseKey[] = (
       searchResponse.aggregations?.os_browsers as any
@@ -431,6 +447,10 @@ const getGeographyMetricsStatistics = async (
       elasticStatsIndexName!,
       geographicaQuery
     );
+
+    if (!searchResponse) {
+      throw new Error("Document search failed");
+    }
 
     const geographyContinentsAggr: EM.GeoContinentAgg[] = (
       searchResponse.aggregations?.continents as any
