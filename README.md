@@ -2,7 +2,7 @@
 
 ![Node.js Version](https://img.shields.io/badge/Node.js-18-green)
 ![TypeScript Version](https://img.shields.io/badge/TypeScript-5.1.6-blue)
-![Version](https://img.shields.io/badge/version-1.0.0-white)
+![Version](https://img.shields.io/badge/version-1.1.0-white)
 
 ## Table of Contents
 
@@ -64,6 +64,9 @@ LOGS_BASE_DIR=/tmp/statistics-service/
 LOG_FILE_NAME=statistics.logs
 SERVER_PORT=3000
 KAFKA_TOPIC_NAME=urlshortener.statistics.events
+KAFKA_MAX_RETRY_TIME_MS=60000
+KAFKA_INITIAL_RETRY_TIME_MS=1000
+KAFKA_MAX_RETRIES=10
 EUREKA_SERVER_HOST=localhost
 EUREKA_SERVER_PORT=8761
 ENABLE_DISCOVERY_CLIENT=true
@@ -103,6 +106,9 @@ REDIS_TTL_DURATION_MS=60000
 #### Kafka Configuration
 
 - **KAFKA_TOPIC_NAME**: Kafka topic for consuming events.
+- **KAFKA_MAX_RETRY_TIME_MS**: The maximum total time (in milliseconds) the consumer will keep retrying a failed operation before giving up. In this case, it's set to 60,000 ms (or 1 minute).
+- **KAFKA_INITIAL_RETRY_TIME_MS**: The initial time (in milliseconds) between retry attempts after a failure. In this case, it's set to 1,000 ms (or 1 second) for the first retry.
+- **KAFKA_MAX_RETRIES**: The maximum number of retry attempts allowed before failing the operation. In this case, it’s set to 10 retries.
 
 #### Eureka Configuration
 
