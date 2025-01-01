@@ -44,8 +44,8 @@ export const EurekaLogger = {
     }
 
     if (args[0].startsWith(DEREGISTERED_WITH_EUREKA_PREFIX)) {
-      const instanceId = args[0].substring(args[0].indexOf(":") + 1);
-      logger.info(`Instance unregistered from eureka: ${instanceId})}`);
+      const instanceId = args[0].substring(args[0].indexOf(":") + 1).trim();
+      logger.info(`Instance unregistered from eureka: ${instanceId}`);
     }
   },
   warn() {},
