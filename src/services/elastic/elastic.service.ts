@@ -21,11 +21,14 @@ export const initElasticClient = async () => {
     await client.ping();
     elasticClient = client;
   } catch (err: any) {
-    if (err instanceof Error) {
+    if (err instanceof Error && err.name === "ConnectionError") {
       logger.error(`Elasticsearch is down: ${err}`);
     }
 
-    throw new ElasticInitError("Failed to initialize ElasticSearch", err);
+    throw new ElasticInitError(
+      "Failed to initialize ElasticSearch client",
+      err
+    );
   }
 
   const createIndexName: string =
