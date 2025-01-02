@@ -10,6 +10,8 @@ const logger = getLogger(
   `${basename(dirname(__filename))}/${basename(__filename)}`
 );
 
+const EUREKA_APP_ID: string = "urlshortener-statistics-service";
+
 let eurekaClient: Eureka;
 
 const initDiscoveryClient = () => {
@@ -47,15 +49,15 @@ const getEurekaClient = (): Eureka => {
 
   const client = new Eureka({
     instance: {
-      app: "urlshortener-statistics-service",
+      app: EUREKA_APP_ID,
       hostName: hostIp,
       ipAddr: hostIp,
       port: {
         $: getApplicationPort(),
         "@enabled": true,
       },
-      vipAddress: "urlshortener-statistics-service",
-      secureVipAddress: "urlshortener-statistics-service",
+      vipAddress: EUREKA_APP_ID,
+      secureVipAddress: EUREKA_APP_ID,
       statusPageUrl: `http://${hostIp}:${getApplicationPort()}/info`,
       dataCenterInfo: {
         name: "MyOwn",
@@ -82,7 +84,7 @@ const getEurekaClient = (): Eureka => {
 };
 
 const getDiscoveryServerInstanceId = (): string => {
-  return `${getApplicationPort()}:urlshortener-statistics-service`;
+  return `${generateRandomInstanceId()}:${EUREKA_APP_ID}:${getApplicationPort()}`;
 };
 
 const getApplicationPort = (): number => {
@@ -97,6 +99,19 @@ const getEurekaServerPort = (): number => {
 
 const getEurekaServerHost = (): string => {
   return process.env.EUREKA_SERVER_HOST || "127.0.0.1";
+};
+
+const generateRandomInstanceId = (): string => {
+  const characters: string =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const charactersLength: number = characters.length;
+  let result: string = "";
+
+  for (let i = 0; i < 12; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
 };
 
 export { destroyDiscoveryClient, initDiscoveryClient };
