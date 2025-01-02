@@ -31,6 +31,8 @@ export const initElasticClient = async () => {
     );
   }
 
+  logger.info("Elastic search connected successfully");
+
   const createIndexName: string =
     process.env["ELASTIC_CREATE_INDEX_NAME"] || "urlshortener-create";
   const elasticStatsIndexName =
