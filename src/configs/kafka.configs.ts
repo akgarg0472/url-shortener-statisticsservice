@@ -95,6 +95,8 @@ const initKafkaWithTopicAndMessageHandler = async (
   const brokersUrl = process.env["KAFKA_BROKER_URLS"]?.split(",") || [
     "localhost:9092",
   ];
+  logger.info(`Initializing kafka with broker url: ${brokersUrl}`);
+  logger.info(`Initializing kafka with topic: ${topics}`);
   kafkaConsumer = createKafkaConsumer(brokersUrl);
   await initKafkaConsumer(kafkaConsumer, topics, messageHandler);
 };

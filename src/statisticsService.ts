@@ -27,11 +27,11 @@ const logger = getLogger(
 
 const port: any = process.env["SERVER_PORT"] || 7979;
 
-const server = app.listen(port, () => {
+const server = app.listen(port, async () => {
   initDiscoveryClient();
   initRedisClient();
-  initElasticClient();
-  initKafkaConsumer();
+  await initElasticClient();
+  await initKafkaConsumer();
   initGeoLocation();
   logger.info(`Server is listening on: ${JSON.stringify(server.address())}`);
 });

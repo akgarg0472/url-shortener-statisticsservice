@@ -16,9 +16,10 @@ const logger = getLogger(
 );
 
 const initKafkaConsumer = async () => {
-  const topicName: string =
-    process.env["KAFKA_TOPIC_NAME"] || "urlshortener-statistics-events";
-  initKafkaWithTopicAndMessageHandler([topicName], kafkaMessageHandler);
+  const topics: string[] = process.env["KAFKA_TOPIC_NAME"]?.split(",") || [
+    "urlshortener.statistics.events",
+  ];
+  await initKafkaWithTopicAndMessageHandler(topics, kafkaMessageHandler);
 };
 
 const kafkaMessageHandler: EachMessageHandler = async ({ message }) => {
