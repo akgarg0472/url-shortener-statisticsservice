@@ -59,6 +59,7 @@ process.on(
 
 process.on("unhandledRejection", async (reason: any, _: Promise<unknown>) => {
   if (reason instanceof ElasticInitError) {
+    logger.warn("Terminating application because elastic search is down");
     await doCleanupAndShutdown(-1);
     return;
   }
