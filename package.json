@@ -19,7 +19,7 @@
   "pkg": {
     "scripts": "dist/**/*.js",
     "targets": [
-      "node18-linux"
+      "node20"
     ],
     "outputPath": "binary/",
     "assets": [
