@@ -1,6 +1,6 @@
 {
   "name": "statistics-service",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Statistics service for url shortener project",
   "type": "commonjs",
   "main": "dist/statisticsService.js",

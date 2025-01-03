@@ -57,9 +57,9 @@ process.on(
   }
 );
 
-process.on("unhandledRejection", (reason: any, _: Promise<unknown>) => {
+process.on("unhandledRejection", async (reason: any, _: Promise<unknown>) => {
   if (reason instanceof ElasticInitError) {
-    doCleanupAndShutdown(-1);
+    await doCleanupAndShutdown(-1);
     return;
   }
 
