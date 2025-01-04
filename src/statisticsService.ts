@@ -42,6 +42,7 @@ export const doCleanupAndShutdown = async (exitCode: number) => {
     await destroyElasticClient();
     await disconnectKafkaConsumer();
     await disconnectRedisClient();
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   } catch (err: any) {
     logger.error(`Error cleaning up resources: ${err}`);
   } finally {
@@ -67,5 +68,5 @@ process.on("unhandledRejection", async (reason: any, _: Promise<unknown>) => {
   logger.error(`Unhandled rejection: ${reason}`);
 });
 
-process.on("SIGINT", () => doCleanupAndShutdown(130));
-process.on("SIGTERM", () => doCleanupAndShutdown(143));
+process.on("SIGINT", async () => await doCleanupAndShutdown(130));
+process.on("SIGTERM", async () => await doCleanupAndShutdown(143));

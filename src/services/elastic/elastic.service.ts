@@ -1,4 +1,4 @@
-import { Client } from "@elastic/elasticsearch";
+import { Client, errors } from "@elastic/elasticsearch";
 import {
   AggregationsAggregate,
   SearchResponse,
@@ -7,6 +7,7 @@ import { basename, dirname } from "path";
 import getElasticClient from "../../configs/elastic.configs";
 import { ElasticInitError } from "../../error/elasticError";
 import { getLogger } from "../../logger/logger";
+import { getEnvNumber } from "../../utils/envUtils";
 
 const logger = getLogger(
   `${basename(dirname(__filename))}/${basename(__filename)}`
@@ -21,7 +22,7 @@ export const initElasticClient = async () => {
     await client.ping();
     elasticClient = client;
   } catch (err: any) {
-    if (err instanceof Error && err.name === "ConnectionError") {
+    if (err instanceof errors.ElasticsearchClientError) {
       logger.error(`Elasticsearch is down: ${err}`);
     }
 
@@ -31,7 +32,9 @@ export const initElasticClient = async () => {
     );
   }
 
-  logger.info("Elastic search connected successfully");
+  logger.info("Elastic connected successfully");
+
+  enableHealthCheck();
 
   const createIndexName: string =
     process.env["ELASTIC_CREATE_INDEX_NAME"] || "urlshortener-create";
@@ -44,6 +47,9 @@ export const initElasticClient = async () => {
 
 export const destroyElasticClient = async () => {
   if (!elasticClient) {
+    logger.warn(
+      "Not destroying elastic instance because it is not initialized!!"
+    );
     return;
   }
 
@@ -53,6 +59,38 @@ export const destroyElasticClient = async () => {
   } catch (err) {
     logger.error(`Error disconnecting ELK: ${err}`);
   }
+};
+
+const enableHealthCheck = () => {
+  let healthCheckInterval = getEnvNumber(
+    "ELASTIC_PING_CHECK_INTERVAL_MS",
+    30_000
+  );
+
+  if (isNaN(healthCheckInterval) || healthCheckInterval <= 0) {
+    logger.warn(
+      "Invalid or missing 'ELASTIC_PING_CHECK_INTERVAL_MS', using default value of 30,000 ms."
+    );
+    healthCheckInterval = 30_000;
+  }
+
+  logger.info(
+    `Initializing elastic health check at ${healthCheckInterval} ms interval`
+  );
+
+  setInterval(async () => {
+    try {
+      await elasticClient!.ping();
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("Elastic ping successful");
+      }
+    } catch (err: any) {
+      if (err instanceof errors.ConnectionError) {
+        logger.error(`Elastic ping failed: ${err.message}`);
+      }
+    }
+  }, healthCheckInterval);
 };
 
 export const multiSearch = async (indexName: string, request: any) => {

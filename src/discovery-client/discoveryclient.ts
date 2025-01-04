@@ -34,6 +34,9 @@ const initDiscoveryClient = () => {
 
 const destroyDiscoveryClient = () => {
   if (!eurekaClient) {
+    logger.warn(
+      "Not destroying discovery client because it is not initialized!!"
+    );
     return;
   }
 
@@ -64,8 +67,8 @@ const getEurekaClient = (): Eureka => {
         "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
       },
       leaseInfo: {
-        renewalIntervalInSecs: 30,
-        durationInSecs: 60,
+        renewalIntervalInSecs: 15,
+        durationInSecs: 30,
       },
       instanceId: getDiscoveryServerInstanceId(),
     },

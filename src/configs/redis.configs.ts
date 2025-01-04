@@ -17,7 +17,7 @@ const initRedisClient = () => {
   });
 
   redis.on("connect", () => {
-    logger.info("Redis connected");
+    logger.debug("Redis connected");
   });
 
   redis.on("close", () => {
