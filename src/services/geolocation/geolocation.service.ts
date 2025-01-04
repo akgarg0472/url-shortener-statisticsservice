@@ -1,4 +1,9 @@
-import { City, Reader, ReaderModel } from "@maxmind/geoip2-node";
+import {
+  AddressNotFoundError,
+  City,
+  Reader,
+  ReaderModel,
+} from "@maxmind/geoip2-node";
 import { readFileSync } from "fs";
 import { basename, dirname } from "path";
 import { getLogger } from "../../logger/logger";
@@ -30,7 +35,9 @@ const getGeoLocation = (ip: string): GeoLocationInfo => {
 
     return location;
   } catch (error: any) {
-    logger.error(`Error fetching geolocation for ip=${ip}: ${error}`);
+    if (!(error instanceof AddressNotFoundError)) {
+      logger.error(`Error fetching geolocation for ip=${ip}: ${error}`);
+    }
 
     return {
       city: "unidentified",

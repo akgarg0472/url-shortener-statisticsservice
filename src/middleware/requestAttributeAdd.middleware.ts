@@ -152,6 +152,7 @@ const addSummaryRequestAttribute = (
     currentDayStartTime,
     currentTime,
     oneWeekOldTime,
+    timezone,
   } = req.query;
 
   const dashboardRequest: RequestModels.DashboardRequest = {
@@ -161,6 +162,7 @@ const addSummaryRequestAttribute = (
     currentDayStartTime: parseInt(currentDayStartTime?.toString()!),
     currentTime: parseInt(currentTime?.toString()!),
     oneWeekOldTime: parseInt(oneWeekOldTime?.toString()!),
+    timezone: timezone?.toString(),
   };
 
   (req as any).request = dashboardRequest;

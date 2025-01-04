@@ -126,7 +126,22 @@ export const pushEventToElastic = async (indexName: string, event: any) => {
 
 const _createIndex = (indexName: string) => {
   elasticClient?.indices
-    .create({ index: indexName })
+    .create({
+      index: indexName,
+      mappings: {
+        dynamic_templates: [
+          {
+            timestamp_as_date: {
+              match: "timestamp",
+              mapping: {
+                type: "date",
+                format: "epoch_millis",
+              },
+            },
+          },
+        ],
+      },
+    })
     .then((res) => {
       logger.info(`Created index ${indexName}...: ${res.acknowledged}`);
     })

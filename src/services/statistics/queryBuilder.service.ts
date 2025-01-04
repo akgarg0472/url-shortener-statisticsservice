@@ -88,6 +88,7 @@ const buildDashboardQuery = (
             field: "timestamp",
             calendar_interval: "1d",
             min_doc_count: 0,
+            time_zone: request.timezone ?? "UTC",
           },
         },
       },

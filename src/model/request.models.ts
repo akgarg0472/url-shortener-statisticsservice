@@ -46,6 +46,7 @@ interface DashboardRequest extends _StatisticsRequest {
   currentDayStartTime: number;
   currentTime: number;
   oneWeekOldTime: number;
+  timezone?: string;
 }
 
 export {

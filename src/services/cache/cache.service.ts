@@ -281,7 +281,9 @@ const getTTLDuration = (): number => {
 const createSummaryStatsKey = (
   request: RequestModels.DashboardRequest
 ): string => {
-  return `stats:dashboard_summary:${request.userId}:${request.currentDayStartTime}`;
+  return `stats:dashboard_summary:${request.userId}:${
+    request.timezone ?? "UTC"
+  }:${request.currentDayStartTime}`;
 };
 
 const createGeneratedShortUrlsKey = (

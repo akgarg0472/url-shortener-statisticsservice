@@ -142,6 +142,12 @@ paths:
           description: "Time one week ago"
           schema:
             type: integer
+        - name: "timezone"
+          in: "query"
+          required: false
+          description: "System timezone (Asia/Kolkata, UTC)"
+          schema:
+            type: string
       responses:
         "200":
           description: "Dashboard summary statistics successfully fetched"
