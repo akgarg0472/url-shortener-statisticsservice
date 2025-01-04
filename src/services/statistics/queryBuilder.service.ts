@@ -252,8 +252,11 @@ const buildGeographicalQuery = (
   };
 };
 
-const buildUrlStatsQuery = (request: RequestModels.UrlMetricsRequest) => {
-  return {
+const buildUrlStatsQuery = (
+  request: RequestModels.UrlMetricsRequest,
+  includeTimestampSort: boolean
+) => {
+  const query: any = {
     size: 0,
     query: {
       bool: {
@@ -293,17 +296,23 @@ const buildUrlStatsQuery = (request: RequestModels.UrlMetricsRequest) => {
       latest_hits: {
         top_hits: {
           size: request.limit,
-          sort: [{ timestamp: "desc" }],
         },
       },
     },
   };
+
+  if (includeTimestampSort) {
+    query.aggs.latest_hits.top_hits.sort = [{ timestamp: "desc" }];
+  }
+
+  return query;
 };
 
 const buildGeneratedShortUrlsQuery = (
-  request: RequestModels.GeneratedShortUrlsRequest
+  request: RequestModels.GeneratedShortUrlsRequest,
+  includeTimestampSort: boolean
 ) => {
-  return {
+  const query: any = {
     size: request.limit,
     from: request.offset * request.limit,
     query: {
@@ -317,14 +326,19 @@ const buildGeneratedShortUrlsQuery = (
         ],
       },
     },
-    sort: [
+  };
+
+  if (includeTimestampSort) {
+    query.sort = [
       {
         timestamp: {
           order: "desc",
         },
       },
-    ],
-  };
+    ];
+  }
+
+  return query;
 };
 
 export {

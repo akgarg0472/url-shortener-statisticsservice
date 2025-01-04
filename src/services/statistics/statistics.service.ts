@@ -1,3 +1,4 @@
+import { errors } from "@elastic/elasticsearch";
 import { basename, dirname } from "path";
 import { getLogger } from "../../logger/logger";
 import * as EM from "../../model/elastic.models";
@@ -11,6 +12,9 @@ const logger = getLogger(
   `${basename(dirname(__filename))}/${basename(__filename)}`
 );
 
+let timestampFieldExistsInGeneratedShortUrl: boolean = true;
+let timestampFieldExistsInUrlStatistics: boolean = true;
+
 const getSummaryStatistics = async (
   request: RequestModels.DashboardRequest
 ): Promise<RM.StatisticsResponse> => {
@@ -21,15 +25,13 @@ const getSummaryStatistics = async (
       return cached;
     }
 
-    const statsIndexName: string | undefined =
-      process.env["ELASTIC_STATS_INDEX_NAME"];
-    const createIndexName: string | undefined =
-      process.env["ELASTIC_CREATE_INDEX_NAME"];
+    const statsIndexName: string = process.env["ELASTIC_STATS_INDEX_NAME"]!;
+    const createIndexName: string = process.env["ELASTIC_CREATE_INDEX_NAME"]!;
 
     const dashboardQuery = QueryBuilder.buildDashboardQuery(
       request,
-      createIndexName!,
-      statsIndexName!
+      createIndexName,
+      statsIndexName
     );
 
     const searchResponse: any = await multiSearch(
@@ -147,13 +149,17 @@ const getGeneratedShortUrls = async (
   }
 
   try {
-    const query = QueryBuilder.buildGeneratedShortUrlsQuery(request);
-    const elasticCreateIndexName = process.env.ELASTIC_CREATE_INDEX_NAME;
+    const elasticCreateIndexName: string =
+      process.env["ELASTIC_CREATE_INDEX_NAME"]!;
 
-    const searchResponse = await searchDocuments(
-      elasticCreateIndexName!,
-      query
+    const query = QueryBuilder.buildGeneratedShortUrlsQuery(
+      request,
+      timestampFieldExistsInGeneratedShortUrl
     );
+
+    const searchResponse = await searchDocuments(elasticCreateIndexName, query);
+
+    timestampFieldExistsInGeneratedShortUrl = true;
 
     if (!searchResponse) {
       throw new Error("Document search failed");
@@ -185,6 +191,19 @@ const getGeneratedShortUrls = async (
 
     return response;
   } catch (error: any) {
+    if (isMissingTimestampFieldToSortError(error)) {
+      timestampFieldExistsInGeneratedShortUrl = false;
+      logger.warn(
+        "No timestamp field found for sorting. Sending fallback response"
+      );
+      const response: RM.GeneratedShortUrlsResponse = {
+        total_records: 0,
+        next_offset: request.offset + 1,
+        urls: [],
+      };
+      return response;
+    }
+
     logger.error(`Error fetching generated short URLs: ${error}`);
 
     const errorResponse: RM.ErrorResponse = {
@@ -207,11 +226,12 @@ const getPopularUrlsStatistics = async (
   }
 
   try {
+    const elasticStatsIndexName: string =
+      process.env["ELASTIC_STATS_INDEX_NAME"]!;
     const popularUrlQuery = QueryBuilder.buildPopularUrlQuery(request);
-    const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
 
     const searchResponse = await searchDocuments(
-      elasticStatsIndexName!,
+      elasticStatsIndexName,
       popularUrlQuery
     );
 
@@ -267,13 +287,19 @@ const getUrlStatistics = async (
   }
 
   try {
-    const urlStatsQuery = QueryBuilder.buildUrlStatsQuery(request);
-    const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
+    const elasticStatsIndexName: string =
+      process.env["ELASTIC_STATS_INDEX_NAME"]!;
+    const urlStatsQuery = QueryBuilder.buildUrlStatsQuery(
+      request,
+      timestampFieldExistsInUrlStatistics
+    );
 
     const searchResponse = await searchDocuments(
-      elasticStatsIndexName!,
+      elasticStatsIndexName,
       urlStatsQuery
     );
+
+    timestampFieldExistsInUrlStatistics = true;
 
     if (!searchResponse) {
       throw new Error("Document search failed");
@@ -323,6 +349,20 @@ const getUrlStatistics = async (
 
     return response;
   } catch (error: any) {
+    if (isMissingTimestampFieldToSortError(error)) {
+      timestampFieldExistsInUrlStatistics = false;
+      logger.warn(
+        "No 'timestamp' field found for sorting in url statistics. Sending fallback response"
+      );
+      const response: RM.UrlStatisticsResponse = {
+        status_code: 200,
+        total_hits: 0,
+        avg_redirect_duration: `0 ms`,
+        latest_hits: [],
+      };
+      return response;
+    }
+
     logger.error(`Error fetching URL statistics: ${error}`);
 
     const errorResponse: RM.ErrorResponse = {
@@ -345,11 +385,12 @@ const getDeviceMetricsStatistics = async (
   }
 
   try {
+    const elasticStatsIndexName: string =
+      process.env["ELASTIC_STATS_INDEX_NAME"]!;
     const deviceMetricsQuery = QueryBuilder.buildDeviceMetricsQuery(request);
-    const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
 
     const searchResponse = await searchDocuments(
-      elasticStatsIndexName!,
+      elasticStatsIndexName,
       deviceMetricsQuery
     );
 
@@ -440,11 +481,12 @@ const getGeographyMetricsStatistics = async (
   }
 
   try {
+    const elasticStatsIndexName: string =
+      process.env["ELASTIC_STATS_INDEX_NAME"]!;
     const geographicaQuery = QueryBuilder.buildGeographicalQuery(request);
-    const elasticStatsIndexName = process.env.ELASTIC_STATS_INDEX_NAME;
 
     const searchResponse = await searchDocuments(
-      elasticStatsIndexName!,
+      elasticStatsIndexName,
       geographicaQuery
     );
 
@@ -541,6 +583,20 @@ const extractPrevSevenDaysHits = (response: any): RM.PerDayHitStats[] => {
   });
 
   return prevSevenDaysHits;
+};
+
+const isMissingTimestampFieldToSortError = (error: any): boolean => {
+  return (
+    error instanceof errors.ResponseError &&
+    error.body?.status === 400 &&
+    error.body?.error?.type === "search_phase_execution_exception" &&
+    Array.isArray(error.body?.error?.root_cause) &&
+    error.body.error.root_cause.some(
+      (cause: any) =>
+        cause.type === "query_shard_exception" &&
+        cause.reason === "No mapping found for [timestamp] in order to sort on"
+    )
+  );
 };
 
 export {

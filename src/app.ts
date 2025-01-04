@@ -1,4 +1,3 @@
-import cors from "cors";
 import express, { Application, Request, Response } from "express";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpecs } from "./configs/swagger.configs";
@@ -9,7 +8,6 @@ const app: Application = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 
 app.use("/api/v1/statistics", statisticsRouterV1);
 

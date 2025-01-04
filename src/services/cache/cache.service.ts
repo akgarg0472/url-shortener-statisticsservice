@@ -272,7 +272,7 @@ const getTTLDuration = (): number => {
       return defaultTTL;
     }
 
-    return ttl + Math.random() * (randomMax - randomMin) + randomMin;
+    return ttl + Math.ceil(Math.random() * (randomMax - randomMin)) + randomMin;
   } catch (err: any) {
     return defaultTTL;
   }
