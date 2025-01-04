@@ -2,7 +2,7 @@
 
 ![Node.js Version](https://img.shields.io/badge/Node.js-18-green)
 ![TypeScript Version](https://img.shields.io/badge/TypeScript-5.1.6-blue)
-![Version](https://img.shields.io/badge/version-1.2.3-white)
+![Version](https://img.shields.io/badge/version-1.3.0-white)
 
 ## Table of Contents
 
@@ -75,6 +75,7 @@ ELASTICSEARCH_PASSWORD=<your_elastic_password>
 ELASTICSEARCH_PROTOCOL=https
 ELASTICSEARCH_HOST=localhost
 ELASTICSEARCH_PORT=9200
+ELASTIC_PING_CHECK_INTERVAL_MS=30000
 ELASTIC_CREATE_INDEX_NAME=urlshortener.create
 ELASTIC_STATS_INDEX_NAME=urlshortener.fetch
 GEOIP_DATABASE_PATH=<path_to_geo_database>
@@ -100,6 +101,7 @@ REDIS_TTL_DURATION_MS=60000
 - **ELASTICSEARCH_PROTOCOL**: Protocol used (e.g., `http`, `https`).
 - **ELASTICSEARCH_HOST**: Elasticsearch host.
 - **ELASTICSEARCH_PORT**: Elasticsearch port.
+- **ELASTIC_PING_CHECK_INTERVAL_MS**: Elastic search ping interval (in milliseconds)
 - **ELASTIC_CREATE_INDEX_NAME**: Index name for create metrics.
 - **ELASTIC_STATS_INDEX_NAME**: Index name for fetch metrics.
 
@@ -175,6 +177,7 @@ docker run --name=urlshortener-statistics-service --network=host \
   -e ELASTICSEARCH_PROTOCOL=https \
   -e ELASTICSEARCH_HOST=localhost \
   -e ELASTICSEARCH_PORT=9200 \
+  -e ELASTIC_PING_CHECK_INTERVAL_MS=30000 \
   -e ELASTIC_CREATE_INDEX_NAME=urlshortener.create \
   -e ELASTIC_STATS_INDEX_NAME=urlshortener.fetch \
   -e GEOIP_DATABASE_PATH=./geolite/GeoLite2-City.mmdb \
