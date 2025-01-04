@@ -39,6 +39,7 @@ const createKafkaConsumer = (
 
   const consumerConfig: ConsumerConfig = {
     groupId: "urlshortener-statistics-service-consumer-group",
+    allowAutoTopicCreation: true,
   };
 
   const c: Consumer = kafka.consumer(consumerConfig);
