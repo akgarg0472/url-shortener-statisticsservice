@@ -6,6 +6,7 @@ const buildDashboardQuery = (
   statsIndexName: string
 ) => {
   return [
+    // Common metrics data [0]
     {},
     {
       size: 0,
@@ -24,12 +25,6 @@ const buildDashboardQuery = (
       aggs: {
         total_hits: { value_count: { field: "requestId.keyword" } },
         avg_redirect_duration: { avg: { field: "eventDuration" } },
-        continents: {
-          terms: { field: "geoLocation.continent.keyword", size: 2147483647 },
-        },
-        countries: {
-          terms: { field: "geoLocation.country.keyword", size: 2147483647 },
-        },
         current_day_hits: {
           filter: {
             range: {
@@ -40,8 +35,20 @@ const buildDashboardQuery = (
             },
           },
         },
+        prev_day_hits: {
+          filter: {
+            range: {
+              timestamp: {
+                gte: request.currentDayStartTime - request.currentDayStartTime,
+                lte: request.currentDayStartTime,
+              },
+            },
+          },
+        },
       },
     },
+
+    // current day created links [1]
     { index: createIndexName },
     {
       size: 0,
@@ -61,9 +68,30 @@ const buildDashboardQuery = (
         },
       },
     },
+
+    // prev day created links [2]
+    { index: createIndexName },
     {
-      index: statsIndexName,
+      size: 0,
+      query: {
+        bool: {
+          must: [
+            { term: { "userId.keyword": request.userId } },
+            {
+              range: {
+                timestamp: {
+                  gte: request.currentDayStartTime - 86400,
+                  lte: request.currentDayStartTime,
+                },
+              },
+            },
+          ],
+        },
+      },
     },
+
+    // prev seven days hits [3]
+    { index: statsIndexName },
     {
       size: 0,
       query: {

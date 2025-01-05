@@ -27,3 +27,4 @@ Dockerfile
 *.swo
 
 nodemon.json
+start.sh

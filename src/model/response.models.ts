@@ -47,16 +47,16 @@ interface UrlStatisticsResponse extends StatisticsResponse {
 }
 
 interface DashboardApiStat {
+  id: string;
   key: string;
-  value: any;
+  value: string;
   suffix: string;
 }
 
 interface DashboardResponse extends StatisticsResponse {
   lifetime_stats: DashboardApiStat[];
   current_day_stats: DashboardApiStat[];
-  countries: CountryKey[];
-  continents: ContinentKey[];
+  prev_day_stats: DashboardApiStat[];
   prev_seven_days_hits: PerDayHitStats[];
 }
 

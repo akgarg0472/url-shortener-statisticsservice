@@ -1,6 +1,6 @@
 {
   "name": "statistics-service",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "description": "Statistics service for url shortener project",
   "type": "commonjs",
   "main": "dist/statisticsService.js",
@@ -8,11 +8,11 @@
   "scripts": {
     "clean": "rimraf dist && rimraf binary",
     "postbuild": "copyfiles -u 1 src/swagger.yml dist/",
-    "compile": "npm run clean && npm run tsc && npm run minify && npm run postbuild",
+    "compile": "npm run tsc && npm run minify && npm run postbuild",
     "tsc": "tsc",
     "build": "npm run compile && npm run package",
     "package": "npm run compile && pkg . --compress=Gzip && copyfiles -u 1 src/swagger.yml binary/",
-    "dev": "npm run compile && clear && node dist/statisticsService.js",
+    "dev": "node dist/statisticsService.js",
     "minify": "find dist -name '*.js' -exec terser {} --output {} --compress --mangle --comments=false --toplevel \\;",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

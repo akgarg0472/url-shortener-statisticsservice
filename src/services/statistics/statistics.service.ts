@@ -39,12 +39,16 @@ const getSummaryStatistics = async (
       dashboardQuery
     );
 
-    const totalHits: number = (
+    const totalHits = (
       searchResponse.responses[0].aggregations?.total_hits as any
     ).value;
 
     const currentDayHitsCount = (
       searchResponse.responses[0].aggregations?.current_day_hits as any
+    ).doc_count;
+
+    const prevDayHitsCount = (
+      searchResponse.responses[0].aggregations?.prev_day_hits as any
     ).doc_count;
 
     const averageRedirectDuration: number = parseFloat(
@@ -54,62 +58,59 @@ const getSummaryStatistics = async (
       )?.toFixed(2)
     );
 
-    const continentAgg: EM.GeoContinentAgg[] = (
-      searchResponse.responses[0].aggregations?.continents as any
-    ).buckets;
-
-    const countriesAgg: EM.GeoCountry[] = (
-      searchResponse.responses[0].aggregations?.countries as any
-    ).buckets;
-
-    const __continents: RM.ContinentKey[] = continentAgg.map((continent) => {
-      const _continent: RM.ContinentKey = {
-        name: continent.key,
-        hits_count: continent.doc_count,
-      };
-      return _continent;
-    });
-
-    const __countries: RM.CountryKey[] = countriesAgg.map((country) => {
-      const _country: RM.CountryKey = {
-        name: country.key,
-        hits_count: country.doc_count,
-      };
-
-      return _country;
-    });
-
     const currentDayUrlsCreated: number =
       searchResponse.responses[1].hits.total.value;
 
+    const prevDayUrlsCreated: number =
+      searchResponse.responses[2].hits.total.value;
+
     const prevSevenDaysHits: RM.PerDayHitStats[] = extractPrevSevenDaysHits(
-      searchResponse.responses[2]
+      searchResponse.responses[3]
     );
 
     const lifetimeStats: RM.DashboardApiStat[] = [
       {
+        id: "lifetime__total__clicks",
         key: "Total Clicks",
         value: totalHits,
         suffix: "clicks",
       },
       {
+        id: "lifetime__avg__redirect__time",
         key: "Average Redirect Time",
         value: averageRedirectDuration
           ? `${averageRedirectDuration.toFixed(2)}`
-          : 0,
+          : "0",
         suffix: "ms",
       },
     ];
 
     const currentDayStats: RM.DashboardApiStat[] = [
       {
+        id: "day__total__clicks",
         key: "Current Day",
         value: currentDayHitsCount,
         suffix: "clicks",
       },
       {
+        id: "day__new__links",
         key: "Current Day",
         value: currentDayUrlsCreated,
+        suffix: "links",
+      },
+    ];
+
+    const prevDayStats: RM.DashboardApiStat[] = [
+      {
+        id: "day__total__clicks",
+        key: "Previous Day",
+        value: prevDayHitsCount,
+        suffix: "clicks",
+      },
+      {
+        id: "day__new__links",
+        key: "Previous Day",
+        value: prevDayUrlsCreated,
         suffix: "links",
       },
     ];
@@ -118,9 +119,8 @@ const getSummaryStatistics = async (
       status_code: 200,
       lifetime_stats: lifetimeStats,
       current_day_stats: currentDayStats,
-      continents: __continents.slice(0, 5),
-      countries: __countries.slice(0, 5),
       prev_seven_days_hits: prevSevenDaysHits,
+      prev_day_stats: prevDayStats,
     };
 
     await cacheService.setCachedSummaryStatistics(request, response);
