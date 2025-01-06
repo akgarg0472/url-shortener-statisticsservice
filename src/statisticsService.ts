@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import { KafkaJSProtocolError } from "kafkajs";
 import { basename, dirname } from "path";
 import app from "./app";
 import { disconnectKafkaConsumer } from "./configs/kafka.configs";
@@ -61,6 +62,12 @@ process.on(
 process.on("unhandledRejection", async (reason: any, _: Promise<unknown>) => {
   if (reason instanceof ElasticInitError) {
     logger.warn("Terminating application because elastic search is down");
+    await doCleanupAndShutdown(-1);
+    return;
+  }
+
+  if (reason instanceof KafkaJSProtocolError) {
+    logger.warn(`Terminating application due to kafka error: ${reason}`);
     await doCleanupAndShutdown(-1);
     return;
   }
