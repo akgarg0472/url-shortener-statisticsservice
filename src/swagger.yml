@@ -386,6 +386,53 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/v1/statistics/usage:
+    get:
+      summary: "Get usage Metrics"
+      description: "Fetches usage statistics related to shortened URLs, such as total short urls created with or without custom alias."
+      tags:
+        - "Statistics-v1"
+      parameters:
+        - name: "userId"
+          in: "query"
+          required: true
+          description: "User ID"
+          schema:
+            type: string
+        - name: "startTime"
+          in: "query"
+          required: true
+          description: "Start time for the period to fetch the urls count"
+          schema:
+            type: integer
+            format: int64
+        - name: "endTime"
+          in: "query"
+          required: true
+          description: "End time for the period to fetch the urls count"
+          schema:
+            type: integer
+            format: int64
+        - name: "metricName"
+          in: "query"
+          required: true
+          description: "Metric name to fetch value for. Allowed values are: shortUrl, customAlias"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Successfully fetched usage metrics"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsageResponse"
+        "400":
+          description: "Invalid query parameters or request body"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     DashboardResponse:
@@ -639,3 +686,14 @@ components:
         hits_count:
           type: integer
           example: 1500
+    UsageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        key:
+          type: string
+          example: "shortUrl or customAlias"
+        value:
+          type: integer
+          example: 23

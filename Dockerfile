@@ -14,11 +14,9 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Runtime Stage
-FROM debian:bullseye-slim
+FROM ubuntu:22.04
 
 WORKDIR /app
-
-RUN apt-get update && apt-get install -y libstdc++6 && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app/binary/statistics-service /app/statistics-service
 COPY --from=build /app/src/swagger.yml /app/swagger.yml

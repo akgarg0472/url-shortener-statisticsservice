@@ -566,8 +566,8 @@ export const getGeographyMetricsStatistics = async (
 export const getUsageStatistics = async (
   request: RequestModels.UsageRequest
 ): Promise<RM.StatisticsResponse> => {
-  if (logger.isInfoEnabled()) {
-    logger.info(`Received usage request: ${JSON.stringify(request)}`);
+  if (logger.isDebugEnabled()) {
+    logger.debug(`Received usage request: ${JSON.stringify(request)}`);
   }
 
   try {
