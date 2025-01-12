@@ -110,11 +110,26 @@ statisticsRouterV1.get(
   }
 );
 
+statisticsRouterV1.get(
+  "/usage",
+  validateQueryParamsAndReturnErrorResponseIfError([
+    "metricName",
+    "userId",
+    "startTime",
+    "endTime",
+  ]),
+  middlewares.addUsageRequestAttributes,
+  async (req: Request, res: Response) => {
+    const request: RequestModels.UsageRequest = (req as any).request;
+    const response = await statisticsService.getUsageStatistics(request);
+    sendResponseToClient(response, res);
+  }
+);
+
 const sendResponseToClient = (response: StatisticsResponse, res: Response) => {
   if (response.status_code) {
     res.status(response.status_code);
   }
-
   res.json(response);
 };
 

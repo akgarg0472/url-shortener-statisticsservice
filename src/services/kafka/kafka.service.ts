@@ -69,6 +69,8 @@ const getStatisticsEvent = (kafkaEvent: StatisticsEvent): any => {
         geoLocation: getGeoLocation(kafkaEvent.ipAddress),
         timestamp: kafkaEvent.timestamp,
         deviceInfo: getDeviceInfo(kafkaEvent.userAgent),
+        customAlias: kafkaEvent.customAlias,
+        success: kafkaEvent.eventType === EventType.URL_CREATE_SUCCESS,
       };
       return urlCreateSuccessEvent;
 
@@ -85,6 +87,8 @@ const getStatisticsEvent = (kafkaEvent: StatisticsEvent): any => {
         geoLocation: getGeoLocation(kafkaEvent.ipAddress),
         timestamp: kafkaEvent.timestamp,
         deviceInfo: getDeviceInfo(kafkaEvent.userAgent),
+        customAlias: kafkaEvent.customAlias,
+        success: kafkaEvent.eventType === EventType.URL_GET_SUCCESS,
       };
       return urlFetchSuccessEvent;
   }

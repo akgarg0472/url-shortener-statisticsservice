@@ -1,6 +1,6 @@
-interface StatisticsResponse {
+type StatisticsResponse = {
   status_code?: number;
-}
+};
 
 interface PingResponse extends StatisticsResponse {
   message: string;
@@ -27,18 +27,18 @@ interface GeographicalStatisticsResponse extends StatisticsResponse {
   countries: CountryKey[];
 }
 
-interface PerDayHitStats {
+type PerDayHitStats = {
   timestamp: number;
   hits: number;
-}
+};
 
-interface LatestHit {
+type LatestHit = {
   ip: string;
   redirect_duration: number;
   timestamp: number;
   device_info: { browser: string; os: string };
   location: { country: string; timezone: string };
-}
+};
 
 interface UrlStatisticsResponse extends StatisticsResponse {
   total_hits: number;
@@ -46,12 +46,12 @@ interface UrlStatisticsResponse extends StatisticsResponse {
   latest_hits: LatestHit[];
 }
 
-interface DashboardApiStat {
+type DashboardApiStat = {
   id: string;
   key: string;
   value: string;
   suffix: string;
-}
+};
 
 interface DashboardResponse extends StatisticsResponse {
   lifetime_stats: DashboardApiStat[];
@@ -60,56 +60,62 @@ interface DashboardResponse extends StatisticsResponse {
   prev_seven_days_hits: PerDayHitStats[];
 }
 
-interface PopularUrlKey {
+type PopularUrlKey = {
   short_url: string;
   hits_count: number;
   original_url?: string;
-}
+};
 
-interface BrowserKey {
+type BrowserKey = {
   name: string;
   hits_count: number;
-}
+};
 
-interface OsBrowserKey {
+type OsBrowserKey = {
   os_name: string;
   hits_count: number;
   browsers: BrowserKey[];
-}
+};
 
-interface OSKey {
+type OSKey = {
   name: string;
   hits_count: number;
-}
+};
 
-interface CityKey {
+type CityKey = {
   name: string;
   hits_count: number;
-}
+};
 
-interface CountryKey {
+type CountryKey = {
   name: string;
   hits_count: number;
   cities?: CityKey[];
-}
+};
 
-interface ContinentKey {
+type ContinentKey = {
   name: string;
   hits_count: number;
   countries?: CountryKey[];
-}
+};
 
-interface UrlMetadata {
+type UrlMetadata = {
   original_url: string;
   short_url: string;
   created_at: Date;
   ip_address: string;
-}
+};
 
 interface GeneratedShortUrlsResponse extends StatisticsResponse {
   total_records: number;
   next_offset: number;
   urls: UrlMetadata[];
+}
+
+interface UsageResponse extends StatisticsResponse {
+  message: string;
+  key: string;
+  value: number;
 }
 
 export {
@@ -133,4 +139,5 @@ export {
   StatisticsResponse,
   UrlMetadata,
   UrlStatisticsResponse,
+  UsageResponse,
 };

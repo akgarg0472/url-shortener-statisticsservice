@@ -1,4 +1,5 @@
 import { errors } from "@elastic/elasticsearch";
+import { SearchTotalHits } from "@elastic/elasticsearch/lib/api/types";
 import { basename, dirname } from "path";
 import { getLogger } from "../../logger/logger";
 import * as EM from "../../model/elastic.models";
@@ -15,7 +16,7 @@ const logger = getLogger(
 let timestampFieldExistsInGeneratedShortUrl: boolean = true;
 let timestampFieldExistsInUrlStatistics: boolean = true;
 
-const getSummaryStatistics = async (
+export const getSummaryStatistics = async (
   request: RequestModels.DashboardRequest
 ): Promise<RM.StatisticsResponse> => {
   try {
@@ -139,7 +140,7 @@ const getSummaryStatistics = async (
   }
 };
 
-const getGeneratedShortUrls = async (
+export const getGeneratedShortUrls = async (
   request: RequestModels.GeneratedShortUrlsRequest
 ): Promise<RM.StatisticsResponse> => {
   const cached = await cacheService.getCachedGeneratedShortUrls(request);
@@ -216,7 +217,7 @@ const getGeneratedShortUrls = async (
   }
 };
 
-const getPopularUrlsStatistics = async (
+export const getPopularUrlsStatistics = async (
   request: RequestModels.PopularUrlsRequest
 ): Promise<RM.StatisticsResponse> => {
   const cached = await cacheService.getCachedPopularUrls(request);
@@ -277,7 +278,7 @@ const getPopularUrlsStatistics = async (
   }
 };
 
-const getUrlStatistics = async (
+export const getUrlStatistics = async (
   request: RequestModels.UrlMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
   const cached = await cacheService.getCachedUrlStatistics(request);
@@ -375,7 +376,7 @@ const getUrlStatistics = async (
   }
 };
 
-const getDeviceMetricsStatistics = async (
+export const getDeviceMetricsStatistics = async (
   request: RequestModels.DeviceMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
   const cached = await cacheService.getCachedDeviceMetrics(request);
@@ -471,7 +472,7 @@ const getDeviceMetricsStatistics = async (
   }
 };
 
-const getGeographyMetricsStatistics = async (
+export const getGeographyMetricsStatistics = async (
   request: RequestModels.GeographicalMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
   const cached = await cacheService.getCachedGeographyMetrics(request);
@@ -562,6 +563,62 @@ const getGeographyMetricsStatistics = async (
   }
 };
 
+export const getUsageStatistics = async (
+  request: RequestModels.UsageRequest
+): Promise<RM.StatisticsResponse> => {
+  if (logger.isInfoEnabled()) {
+    logger.info(`Received usage request: ${JSON.stringify(request)}`);
+  }
+
+  try {
+    const elasticCreateIndexName: string =
+      process.env["ELASTIC_CREATE_INDEX_NAME"]!;
+
+    const usageQuery = QueryBuilder.buildUsageQuery(request);
+
+    const searchResponse = await searchDocuments(
+      elasticCreateIndexName,
+      usageQuery
+    );
+
+    if (!searchResponse) {
+      throw new Error("Document search failed");
+    }
+
+    const total: number | SearchTotalHits | undefined =
+      searchResponse.hits.total;
+
+    let value: number = 0;
+
+    if (typeof total === "number") {
+      value = total;
+    } else if (total && "relation" in total && "value" in total) {
+      value = total.value;
+    } else {
+      throw new Error("Failed to extract value");
+    }
+
+    const response: RM.UsageResponse = {
+      status_code: 200,
+      message: "Usage fetched successfully",
+      key: request.metricName,
+      value: value,
+    };
+
+    return response;
+  } catch (error: any) {
+    logger.error(`Error fetching usage metrics: ${error}`);
+
+    const errorResponse: RM.ErrorResponse = {
+      status_code: 500,
+      errors: ["Internal Server Error"],
+      message: "Internal Server Error",
+    };
+
+    return errorResponse;
+  }
+};
+
 const extractPrevSevenDaysHits = (response: any): RM.PerDayHitStats[] => {
   const status = response.status;
 
@@ -597,13 +654,4 @@ const isMissingTimestampFieldToSortError = (error: any): boolean => {
         cause.reason === "No mapping found for [timestamp] in order to sort on"
     )
   );
-};
-
-export {
-  getDeviceMetricsStatistics,
-  getGeneratedShortUrls,
-  getGeographyMetricsStatistics,
-  getPopularUrlsStatistics,
-  getSummaryStatistics,
-  getUrlStatistics,
 };

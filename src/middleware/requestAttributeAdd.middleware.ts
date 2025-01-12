@@ -188,6 +188,22 @@ const addGeneratedShortUrlsRequestAttribute = (
   next();
 };
 
+const addUsageRequestAttributes = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { metricName, userId, startTime, endTime } = req.query;
+  const usageRequest: RequestModels.UsageRequest = {
+    metricName: metricName!.toString(),
+    userId: userId!.toString(),
+    startTime: parseInt(startTime!.toString(), 10),
+    endTime: parseInt(endTime!.toString(), 10),
+  };
+  (req as any).request = usageRequest;
+  next();
+};
+
 export {
   addDeviceMetricsRequestAttribute,
   addGeneratedShortUrlsRequestAttribute,
@@ -198,4 +214,5 @@ export {
   addRedirectTimeRequestAttribute,
   addSummaryRequestAttribute,
   addUrlMetricsRequestAttribute,
+  addUsageRequestAttributes,
 };

@@ -36,11 +36,11 @@ interface UrlMetricsRequest extends _StatisticsRequest {
   limit: number;
 }
 
-interface GeneratedShortUrlsRequest {
+type GeneratedShortUrlsRequest = {
   userId: string;
   limit: number;
   offset: number;
-}
+};
 
 interface DashboardRequest extends _StatisticsRequest {
   currentDayStartTime: number;
@@ -48,6 +48,13 @@ interface DashboardRequest extends _StatisticsRequest {
   oneWeekOldTime: number;
   timezone?: string;
 }
+
+type UsageRequest = {
+  metricName: string;
+  userId: string;
+  startTime: number;
+  endTime: number;
+};
 
 export {
   DashboardRequest,
@@ -59,4 +66,5 @@ export {
   RedirectStatisticsRequest,
   RedirectTimeRequest,
   UrlMetricsRequest,
+  UsageRequest,
 };

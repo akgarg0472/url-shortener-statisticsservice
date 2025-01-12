@@ -17,6 +17,8 @@ type UrlCreateStatisticsEvent = {
   timestamp: number;
   deviceInfo: DeviceInfo;
   geoLocation: GeoLocationInfo;
+  customAlias: boolean;
+  success: boolean;
 };
 
 type UrlFetchStatisticsEvent = {
@@ -30,6 +32,8 @@ type UrlFetchStatisticsEvent = {
   eventDuration: number;
   timestamp: number;
   geoLocation: GeoLocationInfo;
+  customAlias: boolean;
+  success: boolean;
 };
 
 type DeviceInfo = {

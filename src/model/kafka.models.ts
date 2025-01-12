@@ -16,6 +16,7 @@ type StatisticsEvent = {
   createdAt: number;
   eventDuration: number;
   timestamp: number;
+  customAlias: boolean;
 };
 
 export { EventType, StatisticsEvent };

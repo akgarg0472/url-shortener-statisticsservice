@@ -1,6 +1,6 @@
 import * as RequestModels from "../../model/request.models";
 
-const buildDashboardQuery = (
+export const buildDashboardQuery = (
   request: RequestModels.DashboardRequest,
   createIndexName: string,
   statsIndexName: string
@@ -124,7 +124,9 @@ const buildDashboardQuery = (
   ];
 };
 
-const buildPopularUrlQuery = (request: RequestModels.PopularUrlsRequest) => {
+export const buildPopularUrlQuery = (
+  request: RequestModels.PopularUrlsRequest
+) => {
   const searchRequest = {
     size: 0,
     query: {
@@ -177,7 +179,7 @@ const buildPopularUrlQuery = (request: RequestModels.PopularUrlsRequest) => {
   return searchRequest;
 };
 
-const buildDeviceMetricsQuery = (
+export const buildDeviceMetricsQuery = (
   request: RequestModels.DeviceMetricsRequest
 ) => {
   return {
@@ -225,7 +227,7 @@ const buildDeviceMetricsQuery = (
   };
 };
 
-const buildGeographicalQuery = (
+export const buildGeographicalQuery = (
   request: RequestModels.GeographicalMetricsRequest
 ) => {
   return {
@@ -281,7 +283,7 @@ const buildGeographicalQuery = (
   };
 };
 
-const buildUrlStatsQuery = (
+export const buildUrlStatsQuery = (
   request: RequestModels.UrlMetricsRequest,
   includeTimestampSort: boolean
 ) => {
@@ -337,7 +339,7 @@ const buildUrlStatsQuery = (
   return query;
 };
 
-const buildGeneratedShortUrlsQuery = (
+export const buildGeneratedShortUrlsQuery = (
   request: RequestModels.GeneratedShortUrlsRequest,
   includeTimestampSort: boolean
 ) => {
@@ -370,11 +372,34 @@ const buildGeneratedShortUrlsQuery = (
   return query;
 };
 
-export {
-  buildDashboardQuery,
-  buildDeviceMetricsQuery,
-  buildGeneratedShortUrlsQuery,
-  buildGeographicalQuery,
-  buildPopularUrlQuery,
-  buildUrlStatsQuery,
+export const buildUsageQuery = (request: RequestModels.UsageRequest) => {
+  const query: any = {
+    size: 0,
+    query: {
+      bool: {
+        must: [
+          { term: { "userId.keyword": request.userId } },
+          { term: { success: true } },
+          {
+            range: {
+              timestamp: {
+                gte: request.startTime,
+                lte: request.endTime,
+              },
+            },
+          },
+        ],
+      },
+    },
+  };
+
+  if (request.metricName === "customAlias") {
+    query.query.bool.must.push({
+      term: {
+        customAlias: true,
+      },
+    });
+  }
+
+  return query;
 };
