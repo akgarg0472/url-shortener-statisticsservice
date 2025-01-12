@@ -35,7 +35,6 @@ const onMessage = (message: KafkaMessage) => {
 
   const kafkaEvent: StatisticsEvent = {
     ...JSON.parse(messageString),
-    timestamp: new Date().getTime(),
   };
 
   const indexName: string | null = determineElasticIndexName(
