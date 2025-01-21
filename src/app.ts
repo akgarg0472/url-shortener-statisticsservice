@@ -2,6 +2,7 @@ import express, { Application, Request, Response } from "express";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpecs } from "./configs/swagger.configs";
 import { PingResponse } from "./model/response.models";
+import discoveryRouterV1 from "./routes/discovery.routes";
 import statisticsRouterV1 from "./routes/statistics.routes.v1";
 
 const app: Application = express();
@@ -10,6 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1/statistics", statisticsRouterV1);
+app.use("/admin", discoveryRouterV1);
 
 app.get("/ping", (req: Request, res: Response) => {
   res.json({

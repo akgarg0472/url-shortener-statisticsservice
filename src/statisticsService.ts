@@ -12,7 +12,7 @@ import {
 import {
   destroyDiscoveryClient,
   initDiscoveryClient,
-} from "./discovery-client/discoveryclient";
+} from "./discovery-client/discoveryClient";
 import { ElasticInitError } from "./error/elasticError";
 import { getLogger } from "./logger/logger";
 import {

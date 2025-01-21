@@ -61,7 +61,6 @@ const getEurekaClient = (): Eureka => {
       },
       vipAddress: EUREKA_APP_ID,
       secureVipAddress: EUREKA_APP_ID,
-      statusPageUrl: `http://${hostIp}:${getApplicationPort()}/info`,
       dataCenterInfo: {
         name: "MyOwn",
         "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
@@ -70,7 +69,8 @@ const getEurekaClient = (): Eureka => {
         renewalIntervalInSecs: 15,
         durationInSecs: 30,
       },
-      instanceId: getDiscoveryServerInstanceId(),
+      instanceId: `${hostIp}:${EUREKA_APP_ID}:${getApplicationPort()}`,
+      statusPageUrl: `http://${hostIp}:${getApplicationPort()}/admin/info`,
     },
     eureka: {
       host: getEurekaServerHost(),
@@ -86,10 +86,6 @@ const getEurekaClient = (): Eureka => {
   return client;
 };
 
-const getDiscoveryServerInstanceId = (): string => {
-  return `${generateRandomInstanceId()}:${EUREKA_APP_ID}:${getApplicationPort()}`;
-};
-
 const getApplicationPort = (): number => {
   const port = process.env.SERVER_PORT || "7979";
   return parseInt(port);
@@ -102,19 +98,6 @@ const getEurekaServerPort = (): number => {
 
 const getEurekaServerHost = (): string => {
   return process.env.EUREKA_SERVER_HOST || "127.0.0.1";
-};
-
-const generateRandomInstanceId = (): string => {
-  const characters: string =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const charactersLength: number = characters.length;
-  let result: string = "";
-
-  for (let i = 0; i < 12; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-
-  return result;
 };
 
 export { destroyDiscoveryClient, initDiscoveryClient };

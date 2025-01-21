@@ -1,6 +1,6 @@
 {
   "name": "statistics-service",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Statistics service for url shortener project",
   "type": "commonjs",
   "main": "dist/statisticsService.js",
@@ -8,7 +8,7 @@
   "scripts": {
     "clean": "rimraf dist && rimraf binary",
     "postbuild": "copyfiles -u 1 src/swagger.yml dist/",
-    "compile": "npm run tsc && npm run minify && npm run postbuild",
+    "compile": "npm run tsc && npm run minify && npm run postbuild && node dist/build.js",
     "tsc": "tsc",
     "build": "npm run compile && npm run package",
     "package": "npm run compile && pkg . --compress=Gzip && copyfiles -u 1 src/swagger.yml binary/",
