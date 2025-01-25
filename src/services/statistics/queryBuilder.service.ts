@@ -39,7 +39,7 @@ export const buildDashboardQuery = (
           filter: {
             range: {
               timestamp: {
-                gte: request.currentDayStartTime - request.currentDayStartTime,
+                gte: request.currentDayStartTime - 86400000,
                 lte: request.currentDayStartTime,
               },
             },
@@ -80,7 +80,7 @@ export const buildDashboardQuery = (
             {
               range: {
                 timestamp: {
-                  gte: request.currentDayStartTime - 86400,
+                  gte: request.currentDayStartTime - 86400000,
                   lte: request.currentDayStartTime,
                 },
               },
