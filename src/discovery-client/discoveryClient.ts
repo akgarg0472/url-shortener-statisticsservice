@@ -1,9 +1,10 @@
-import { Eureka } from "eureka-js-client";
+import { Eureka, EurekaClient } from "eureka-js-client";
 import { basename, dirname } from "path";
 import { getLogger } from "../logger/logger";
 import { doCleanupAndShutdown } from "../statisticsService";
 import { getEnvNumber } from "../utils/envUtils";
 import { getLocalIPAddress } from "../utils/networkUtils";
+import { ServiceEndpoint } from "./endpoint";
 import { EurekaLogger } from "./eurekaLogger";
 
 const logger = getLogger(
@@ -22,7 +23,7 @@ const initDiscoveryClient = () => {
     return;
   }
 
-  eurekaClient = getEurekaClient();
+  eurekaClient = createEurekaClient();
 
   eurekaClient.start((err: Error) => {
     if (err) {
@@ -47,7 +48,7 @@ const destroyDiscoveryClient = () => {
   });
 };
 
-const getEurekaClient = (): Eureka => {
+const createEurekaClient = (): Eureka => {
   const hostIp = getLocalIPAddress();
 
   const client = new Eureka({
@@ -100,4 +101,40 @@ const getEurekaServerHost = (): string => {
   return process.env.EUREKA_SERVER_HOST || "127.0.0.1";
 };
 
-export { destroyDiscoveryClient, initDiscoveryClient };
+const getServiceEndpoints = (serviceName: string): ServiceEndpoint[] => {
+  const eurekaEndpoints: EurekaClient.EurekaInstanceConfig[] =
+    eurekaClient.getInstancesByAppId(serviceName);
+
+  const endpoints: ServiceEndpoint[] = [];
+
+  eurekaEndpoints.forEach((endpoint) => {
+    const ip: string = endpoint.ipAddr;
+    const { port, scheme } = extractPortAndScheme(endpoint);
+
+    if (port && scheme) {
+      endpoints.push({
+        scheme: scheme,
+        ip: ip,
+        port: port,
+      });
+    }
+  });
+
+  return endpoints;
+};
+
+const extractPortAndScheme = (
+  eurekaEndpointConfig: any
+): { port: number | null; scheme: string | null } => {
+  if (eurekaEndpointConfig.securePort?.["@enabled"] === "true") {
+    return { port: eurekaEndpointConfig.securePort.$, scheme: "https" };
+  }
+
+  if (eurekaEndpointConfig.port?.["@enabled"] === "true") {
+    return { port: eurekaEndpointConfig.port.$, scheme: "http" };
+  }
+
+  return { port: null, scheme: null };
+};
+
+export { destroyDiscoveryClient, getServiceEndpoints, initDiscoveryClient };

@@ -5,8 +5,9 @@ import { getLogger } from "../../logger/logger";
 import * as EM from "../../model/elastic.models";
 import * as RequestModels from "../../model/request.models";
 import * as RM from "../../model/response.models";
-import * as cacheService from "../cache/cache.service";
 import { multiSearch, searchDocuments } from "../elastic/elastic.service";
+import * as subscriptionService from "../subscription/subscription.service";
+import * as cacheService from "./cache/cache.service";
 import * as QueryBuilder from "./queryBuilder.service";
 
 const logger = getLogger(
@@ -281,6 +282,24 @@ export const getPopularUrlsStatistics = async (
 export const getUrlStatistics = async (
   request: RequestModels.UrlMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
+  const isAllowed: boolean =
+    await subscriptionService.isUserAllowedToAccessResource(
+      request.requestId,
+      request.userId,
+      "url"
+    );
+
+  if (!isAllowed) {
+    const response: RM.ErrorResponse = {
+      status_code: 429,
+      message: "Not allowed",
+      errors: [
+        `You are not allowed to access this endpoint. Kindly upgrade your plan to access this feature}`,
+      ],
+    };
+    return response;
+  }
+
   const cached = await cacheService.getCachedUrlStatistics(request);
 
   if (cached) {
@@ -379,6 +398,24 @@ export const getUrlStatistics = async (
 export const getDeviceMetricsStatistics = async (
   request: RequestModels.DeviceMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
+  const isAllowed: boolean =
+    await subscriptionService.isUserAllowedToAccessResource(
+      request.requestId,
+      request.userId,
+      "device"
+    );
+
+  if (!isAllowed) {
+    const response: RM.ErrorResponse = {
+      status_code: 429,
+      message: "Not allowed",
+      errors: [
+        `You are not allowed to access this endpoint. Kindly upgrade your plan to access this feature}`,
+      ],
+    };
+    return response;
+  }
+
   const cached = await cacheService.getCachedDeviceMetrics(request);
 
   if (cached) {
@@ -475,6 +512,24 @@ export const getDeviceMetricsStatistics = async (
 export const getGeographyMetricsStatistics = async (
   request: RequestModels.GeographicalMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
+  const isAllowed: boolean =
+    await subscriptionService.isUserAllowedToAccessResource(
+      request.requestId,
+      request.userId,
+      "geography"
+    );
+
+  if (!isAllowed) {
+    const response: RM.ErrorResponse = {
+      status_code: 429,
+      message: "Not allowed",
+      errors: [
+        `You are not allowed to access this endpoint. Kindly upgrade your plan to access this feature}`,
+      ],
+    };
+    return response;
+  }
+
   const cached = await cacheService.getCachedGeographyMetrics(request);
 
   if (cached) {

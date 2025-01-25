@@ -1,6 +1,6 @@
 {
   "name": "statistics-service",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Statistics service for url shortener project",
   "type": "commonjs",
   "main": "dist/statisticsService.js",
@@ -31,6 +31,7 @@
   "dependencies": {
     "@elastic/elasticsearch": "^8.17.0",
     "@maxmind/geoip2-node": "^5.0.0",
+    "axios": "^1.7.9",
     "body-parser": "^1.20.2",
     "dotenv": "^16.3.1",
     "eureka-js-client": "^4.5.0",

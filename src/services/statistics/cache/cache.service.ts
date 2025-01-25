@@ -1,8 +1,8 @@
 import { basename, dirname } from "path";
-import { getRedisInstance } from "../../configs/redis.configs";
-import { getLogger } from "../../logger/logger";
-import * as RequestModels from "../../model/request.models";
-import * as ResponseModel from "../../model/response.models";
+import { getRedisInstance } from "../../../configs/redis.configs";
+import { getLogger } from "../../../logger/logger";
+import * as RequestModels from "../../../model/request.models";
+import * as ResponseModel from "../../../model/response.models";
 
 const logger = getLogger(
   `${basename(dirname(__filename))}/${basename(__filename)}`

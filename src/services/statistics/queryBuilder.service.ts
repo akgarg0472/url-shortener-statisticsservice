@@ -182,7 +182,7 @@ export const buildPopularUrlQuery = (
 export const buildDeviceMetricsQuery = (
   request: RequestModels.DeviceMetricsRequest
 ) => {
-  return {
+  const query: any = {
     size: 0,
     query: {
       bool: {
@@ -192,11 +192,6 @@ export const buildDeviceMetricsQuery = (
               userId: request.userId,
             },
           },
-          // {
-          //   match: {
-          //     shortUrl: request.shortUrl,
-          //   },
-          // },
           {
             range: {
               timestamp: {
@@ -225,6 +220,16 @@ export const buildDeviceMetricsQuery = (
       },
     },
   };
+
+  if (request.shortUrl) {
+    query.query.bool.must.push({
+      match: {
+        shortUrl: request.shortUrl,
+      },
+    });
+  }
+
+  return query;
 };
 
 export const buildGeographicalQuery = (

@@ -47,11 +47,11 @@ export const getLogger = (fileName: string): winston.Logger => {
   let logger: winston.Logger | undefined = loggerMap.get(fileName);
 
   if (logger !== undefined) {
-    return logger; // Return cached logger if it exists
+    return logger;
   }
 
-  logger = createLogger(fileName); // Create a new logger
-  loggerMap.set(fileName, logger); // Cache the logger
+  logger = createLogger(fileName);
+  loggerMap.set(fileName, logger);
   return logger;
 };
 
@@ -74,9 +74,9 @@ const createLogger = (fileName: string): winston.Logger => {
   }
 
   if (env === Environment.PROD) {
-    return _getFileLogger(fileName, level); // Use file logger in production environment only
+    return _getFileLogger(fileName, level);
   } else {
-    return _getConsoleLogger(fileName, level); // Use console logger in non-production environment
+    return _getConsoleLogger(fileName, level);
   }
 };
 

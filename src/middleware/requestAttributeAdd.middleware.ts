@@ -1,5 +1,8 @@
+import { randomUUID } from "crypto";
 import { NextFunction, Request, Response } from "express";
 import * as RequestModels from "../model/request.models";
+
+const REQUEST_ID_HEADER: string = "X-Request-Id";
 
 const addPopularUrlRequestAttribute = (
   req: Request,
@@ -14,6 +17,7 @@ const addPopularUrlRequestAttribute = (
     endTime: parseInt(endTime?.toString()!),
     sortOrder: sortOrder ? sortOrder.toString() : "asc",
     limit: limit ? parseInt(limit.toString()!) : 10,
+    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
   };
 
   (req as any).request = popularUrlsRequest;
@@ -33,6 +37,7 @@ const addDeviceMetricsRequestAttribute = (
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
+    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
   };
 
   (req as any).request = deviceMetricsRequest;
@@ -52,6 +57,7 @@ const addGeographicalMetricsRequestAttribute = (
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
+    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
   };
 
   (req as any).request = deviceMetricsRequest;
@@ -71,6 +77,7 @@ const addIpRequestRequestAttribute = (
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
+    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
   };
 
   (req as any).request = deviceMetricsRequest;
@@ -91,6 +98,7 @@ const addRedirectStatsRequestAttribute = (
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
     eventType: eventType?.toString()!,
+    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
   };
 
   (req as any).request = redirectStatisticsRequest;
@@ -111,6 +119,7 @@ const addRedirectTimeRequestAttribute = (
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
     eventType: eventType?.toString()!,
+    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
   };
 
   (req as any).request = redirectTimeRequest;
@@ -133,6 +142,7 @@ const addUrlMetricsRequestAttribute = (
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
     limit: __limit <= 10 ? __limit : 10,
+    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
   };
 
   (req as any).request = urlMetricsRequest;
@@ -163,6 +173,7 @@ const addSummaryRequestAttribute = (
     currentTime: parseInt(currentTime?.toString()!),
     oneWeekOldTime: parseInt(oneWeekOldTime?.toString()!),
     timezone: timezone?.toString(),
+    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
   };
 
   (req as any).request = dashboardRequest;
@@ -181,6 +192,7 @@ const addGeneratedShortUrlsRequestAttribute = (
     userId: userId?.toString()!,
     limit: limit ? parseInt(limit.toString()!) : 5,
     offset: offset ? parseInt(offset.toString()!) : 0,
+    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
   };
 
   (req as any).request = generatedShortUrlsRequest;
@@ -199,6 +211,7 @@ const addUsageRequestAttributes = (
     userId: userId!.toString(),
     startTime: parseInt(startTime!.toString(), 10),
     endTime: parseInt(endTime!.toString(), 10),
+    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
   };
   (req as any).request = usageRequest;
   next();
