@@ -23,8 +23,8 @@ export const isUserAllowedToAccessResource = async (
   userId: string,
   resourceType: "device" | "geography" | "url"
 ): Promise<boolean> => {
-  if (logger.isInfoEnabled()) {
-    logger.info(
+  if (logger.isDebugEnabled()) {
+    logger.debug(
       `[${requestId}] Checking if user ${userId} is allowed to access ${resourceType} metrics`
     );
   }

@@ -293,9 +293,7 @@ export const getUrlStatistics = async (
     const response: RM.ErrorResponse = {
       status_code: 403,
       message: "Permission denied",
-      errors: [
-        `You are not allowed to access this endpoint. Kindly upgrade your plan to access this feature}`,
-      ],
+      errors: [`Kindly upgrade your plan to access this resource`],
     };
     return response;
   }
@@ -409,9 +407,7 @@ export const getDeviceMetricsStatistics = async (
     const response: RM.ErrorResponse = {
       status_code: 403,
       message: "Permission denied",
-      errors: [
-        `You are not allowed to access this endpoint. Kindly upgrade your plan to access this feature}`,
-      ],
+      errors: [`Kindly upgrade your plan to access this resource`],
     };
     return response;
   }
@@ -523,9 +519,7 @@ export const getGeographyMetricsStatistics = async (
     const response: RM.ErrorResponse = {
       status_code: 403,
       message: "Permission denied",
-      errors: [
-        `You are not allowed to access this endpoint. Kindly upgrade your plan to access this feature}`,
-      ],
+      errors: [`Kindly upgrade your plan to access this resource`],
     };
     return response;
   }
