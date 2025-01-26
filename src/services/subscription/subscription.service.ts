@@ -49,13 +49,19 @@ export const isUserAllowedToAccessResource = async (
 
   switch (resourceType) {
     case "device":
-      return privileges.includes(ALLOWED_DEVICE_METRIC_PRIVILEGE);
+      return privileges.some((entry) =>
+        entry.startsWith(ALLOWED_DEVICE_METRIC_PRIVILEGE)
+      );
 
     case "geography":
-      return privileges.includes(ALLOWED_GEOGRAPHIC_METRIC_PRIVILEGE);
+      return privileges.some((entry) =>
+        entry.startsWith(ALLOWED_GEOGRAPHIC_METRIC_PRIVILEGE)
+      );
 
     case "url":
-      return privileges.includes(ALLOWED_URL_METRIC_METRIC_PRIVILEGE);
+      return privileges.some((entry) =>
+        entry.startsWith(ALLOWED_URL_METRIC_METRIC_PRIVILEGE)
+      );
 
     default:
       return false;
