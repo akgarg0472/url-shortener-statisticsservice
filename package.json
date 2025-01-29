@@ -1,6 +1,6 @@
 {
   "name": "statistics-service",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "Statistics service for url shortener project",
   "type": "commonjs",
   "main": "dist/statisticsService.js",
@@ -17,7 +17,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "pkg": {
-    "scripts": "dist/**/*.js",
+    "scripts": [
+      "dist/**/*.js",
+      "node_modules/axios/dist/node/axios.cjs"
+    ],
     "targets": [
       "node20"
     ],
