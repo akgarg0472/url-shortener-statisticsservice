@@ -2,7 +2,7 @@
 
 ![Node.js Version](https://img.shields.io/badge/Node.js-20-green)
 ![TypeScript Version](https://img.shields.io/badge/TypeScript-5.1.6-blue)
-![Version](https://img.shields.io/badge/version-2.3.4-white)
+![Version](https://img.shields.io/badge/version-2.4.0-white)
 
 ## Table of Contents
 
@@ -23,7 +23,7 @@ Key features include:
 
 - Elasticsearch integration for efficient metrics storage and querying.
 - RESTful API for fetching metrics and statistics.
-- Eureka client for service discovery (optional).
+- Conjsul client for service discovery (optional).
 
 ## Prerequisites
 
@@ -34,7 +34,7 @@ Ensure the following are installed on your system:
 - **Docker** (optional, for containerized setup)
 - **Elasticsearch** (8.x)
 - **Kafka** (for consuming events)
-- **Eureka Server** (for service discovery)
+- **Consul Server** (for service discovery)
 
 ## Installation
 
@@ -67,9 +67,12 @@ KAFKA_TOPIC_NAME=urlshortener.statistics.events
 KAFKA_MAX_RETRY_TIME_MS=60000
 KAFKA_INITIAL_RETRY_TIME_MS=1000
 KAFKA_MAX_RETRIES=10
-EUREKA_SERVER_HOST=localhost
-EUREKA_SERVER_PORT=8761
 ENABLE_DISCOVERY_CLIENT=true
+DISCOVERY_SERVER_HOST=localhost
+DISCOVERY_SERVER_PORT=8500
+DISCOVERY_SERVER_MAX_RETRIES=5
+DISCOVERY_SERVER_REQUEST_RETRY_DELAY_MS=500
+DISCOVERY_SERVER_SERVER_QUERY_INTERVAL_MS=30000
 ELASTICSEARCH_USERNAME=<your_elastic_username>
 ELASTICSEARCH_PASSWORD=<your_elastic_password>
 ELASTICSEARCH_PROTOCOL=https
@@ -112,11 +115,14 @@ REDIS_TTL_DURATION_MS=60000
 - **KAFKA_INITIAL_RETRY_TIME_MS**: The initial time (in milliseconds) between retry attempts after a failure. In this case, it's set to 1,000 ms (or 1 second) for the first retry.
 - **KAFKA_MAX_RETRIES**: The maximum number of retry attempts allowed before failing the operation. In this case, it’s set to 10 retries.
 
-#### Eureka Configuration
+#### Discovery Server Configuration
 
-- **EUREKA_SERVER_HOST**: Eureka server host.
-- **EUREKA_SERVER_PORT**: Eureka server port.
-- **ENABLE_DISCOVERY_CLIENT**: Enable/disable Eureka client (true/false).
+- **ENABLE_DISCOVERY_CLIENT**: Enable/disable discovery client (true/false).
+- **DISCOVERY_SERVER_HOST**: Discovery server host (e.g., localhost).
+- **DISCOVERY_SERVER_PORT**: Discovery server port (e.g., 8500).
+- **DISCOVERY_SERVER_MAX_RETRIES**: Maximum number of retries for connecting to the discovery server (e.g., 5).
+- **DISCOVERY_SERVER_REQUEST_RETRY_DELAY_MS**: Delay in milliseconds between retries for requests to the discovery server (e.g., 500 ms).
+- **DISCOVERY_SERVER_SERVER_QUERY_INTERVAL_MS**: Interval in milliseconds between queries to the discovery server (e.g., 30000 ms).
 
 #### GeoIP Database Configuration
 
@@ -169,9 +175,12 @@ docker run --name=urlshortener-statistics-service --network=host \
   -e LOG_FILE_NAME=statistics.logs \
   -e SERVER_PORT=3000 \
   -e KAFKA_TOPIC_NAME=urlshortener.statistics.events \
-  -e EUREKA_SERVER_HOST=localhost \
-  -e EUREKA_SERVER_PORT=8761 \
   -e ENABLE_DISCOVERY_CLIENT=true \
+  -e DISCOVERY_SERVER_HOST=localhost \
+  -e DISCOVERY_SERVER_PORT=8500 \
+  -e DISCOVERY_SERVER_MAX_RETRIES=5 \
+  -e DISCOVERY_SERVER_REQUEST_RETRY_DELAY_MS=500 \
+  -e DISCOVERY_SERVER_SERVER_QUERY_INTERVAL_MS=30000 \
   -e ELASTICSEARCH_USERNAME=elastic \
   -e ELASTICSEARCH_PASSWORD=elastic \
   -e ELASTICSEARCH_PROTOCOL=https \
@@ -253,10 +262,10 @@ sample payloads, and error codes, making it easy for developers to integrate wit
         akgarg0472/urlshortener-statistics-service:1.0.0
      ```
 
-3. **Eureka Client (Optional)**:
+3. **Discovery Client (Optional)**:
 
-   - If `ENABLE_DISCOVERY_CLIENT` is set to `true`, ensure the Eureka server is running and accessible at the specified host and port (`EUREKA_SERVER_HOST` and `EUREKA_SERVER_PORT`).
-   - If you do not use Eureka, set `ENABLE_DISCOVERY_CLIENT=false` to bypass Eureka integration.
+   - If `ENABLE_DISCOVERY_CLIENT` is set to `true`, ensure the Discovery server is running and accessible at the specified host and port (`DISCOVERY_SERVER_HOST` and `DISCOVERY_SERVER_PORT`).
+   - If you do not use Discovery Server, set `ENABLE_DISCOVERY_CLIENT=false` to bypass Consul integration.
 
 4. **Logging Directory**:
    Ensure the directory specified in `LOGS_BASE_DIR` exists and is writable by the service. If the directory does not exist, create it manually:

@@ -101,11 +101,18 @@ const fetchSubscriptionDetailsFromSubscriptionService = async (
     process.env["SUBSCRIPTION_SERVICE_ACTIVE_BASE_PATH"] ??
     "/api/v1/subscriptions/active";
 
-  const endpoints = getServiceEndpoints(subsServiceName);
+  const endpoints = await getServiceEndpoints(subsServiceName);
 
   for (let i = 0; i < endpoints.length; i++) {
     const { scheme, ip, port } = endpoints[i];
-    const url = `${scheme}://${ip}:${port}${activeSubsPath}?userId=${userId}`;
+
+    const url = `${scheme}://${ip}:${port}${
+      activeSubsPath.startsWith("/") ? activeSubsPath : "/" + activeSubsPath
+    }?userId=${userId}`;
+
+    if (logger.isInfoEnabled()) {
+      logger.info(`${requestId} Subscription details endpoint: ${url}`);
+    }
 
     try {
       const response = await axios.get(url, {

@@ -29,7 +29,7 @@ const logger = getLogger(
 const port: any = process.env["SERVER_PORT"] || 7979;
 
 const server = app.listen(port, async () => {
-  initDiscoveryClient();
+  await initDiscoveryClient();
   initRedisClient();
   await initElasticClient();
   await initKafkaConsumer();
