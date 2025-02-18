@@ -87,12 +87,7 @@ export const destroyDiscoveryClient = async () => {
   } catch (err: any) {
     logger.error(`Failed to stop Discovery client: ${err}`);
   } finally {
-    if (serverQueryInterval) {
-      clearInterval(serverQueryInterval);
-    }
-    if (heartbeatInterval) {
-      clearInterval(heartbeatInterval);
-    }
+    clearRunningIntervals();
   }
 };
 
@@ -189,6 +184,15 @@ const initHeartbeat = () => {
   }, 30000);
 };
 
+const clearRunningIntervals = () => {
+  if (serverQueryInterval) {
+    clearInterval(serverQueryInterval);
+  }
+  if (heartbeatInterval) {
+    clearInterval(heartbeatInterval);
+  }
+};
+
 const sendHeartbeat = async () => {
   const checkId = "service:" + serviceId;
 
@@ -203,5 +207,13 @@ const sendHeartbeat = async () => {
     });
   } catch (err: any) {
     logger.error(`Error sending heartbeat: ${err}`);
+
+    if (err instanceof Error) {
+      if (err.message.includes("not found")) {
+        logger.info("Service registration not found. Re-registering service");
+        clearRunningIntervals();
+        initDiscoveryClient();
+      }
+    }
   }
 };
