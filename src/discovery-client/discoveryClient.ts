@@ -47,7 +47,7 @@ export const initDiscoveryClient = async (isRetry: boolean = false) => {
       name: `health-check`,
       timeout: "5s",
       ttl: "30s",
-      deregistercriticalserviceafter: "30s",
+      deregistercriticalserviceafter: "1m",
     },
   };
 
