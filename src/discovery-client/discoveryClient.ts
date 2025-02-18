@@ -21,6 +21,7 @@ const serviceId = `${serviceName}-${randomUUID().toString().replace(/-/g, "")}`;
 const serviceEndpoints: ServiceEndpoint[] = [];
 
 let serverQueryInterval: NodeJS.Timeout | null = null;
+let heartbeatInterval: NodeJS.Timeout | null = null;
 let discoveryClient: Consul;
 
 export const initDiscoveryClient = async (isRetry: boolean = false) => {
@@ -42,12 +43,19 @@ export const initDiscoveryClient = async (isRetry: boolean = false) => {
     name: serviceName,
     address: getLocalIPAddress(),
     port: getApplicationPort(),
+    check: {
+      name: `health-check`,
+      timeout: "5s",
+      ttl: "30s",
+      deregistercriticalserviceafter: "30s",
+    },
   };
 
   try {
     await discoveryClient.agent.service.register(consulRegisterOptions);
     logger.info("Discovery client initialized successfully");
     initDiscoveryClientQueryLoop();
+    initHeartbeat();
   } catch (err: any) {
     logger.error(`Failed to initialize Discovery client: ${err}`);
 
@@ -66,7 +74,7 @@ export const initDiscoveryClient = async (isRetry: boolean = false) => {
   }
 };
 
-export const destroyDiscoveryClient = () => {
+export const destroyDiscoveryClient = async () => {
   if (!discoveryClient) {
     logger.warn(
       "Not destroying discovery client because it is not initialized!!"
@@ -75,12 +83,15 @@ export const destroyDiscoveryClient = () => {
   }
 
   try {
-    discoveryClient.agent.service.deregister(serviceId);
+    await discoveryClient.agent.service.deregister(serviceId);
   } catch (err: any) {
     logger.error(`Failed to stop Discovery client: ${err}`);
   } finally {
     if (serverQueryInterval) {
       clearInterval(serverQueryInterval);
+    }
+    if (heartbeatInterval) {
+      clearInterval(heartbeatInterval);
     }
   }
 };
@@ -169,4 +180,28 @@ const getDiscoveryServerPort = (): number => {
 
 const getDiscoveryServerHost = (): string => {
   return process.env["DISCOVERY_SERVER_HOST"] || "127.0.0.1";
+};
+
+const initHeartbeat = () => {
+  sendHeartbeat();
+  heartbeatInterval = setInterval(() => {
+    sendHeartbeat();
+  }, 30000);
+};
+
+const sendHeartbeat = async () => {
+  const checkId = "service:" + serviceId;
+
+  if (logger.isDebugEnabled()) {
+    logger.debug(`Sending hearbeat for ${checkId}`);
+  }
+
+  try {
+    await discoveryClient.agent.check.pass({
+      id: checkId,
+      note: `Heartbeat from agent`,
+    });
+  } catch (err: any) {
+    logger.error(`Error sending heartbeat: ${err}`);
+  }
 };

@@ -2,7 +2,7 @@
 
 ![Node.js Version](https://img.shields.io/badge/Node.js-20-green)
 ![TypeScript Version](https://img.shields.io/badge/TypeScript-5.1.6-blue)
-![Version](https://img.shields.io/badge/version-2.4.0-white)
+![Version](https://img.shields.io/badge/version-2.4.1-white)
 
 ## Table of Contents
 

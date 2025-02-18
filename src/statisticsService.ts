@@ -39,7 +39,7 @@ const server = app.listen(port, async () => {
 
 export const doCleanupAndShutdown = async (exitCode: number) => {
   try {
-    destroyDiscoveryClient();
+    await destroyDiscoveryClient();
     await destroyElasticClient();
     await disconnectKafkaConsumer();
     await disconnectRedisClient();
