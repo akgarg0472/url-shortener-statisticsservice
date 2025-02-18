@@ -181,7 +181,7 @@ const initHeartbeat = () => {
   sendHeartbeat();
   heartbeatInterval = setInterval(() => {
     sendHeartbeat();
-  }, 30000);
+  }, 15000);
 };
 
 const clearRunningIntervals = () => {
