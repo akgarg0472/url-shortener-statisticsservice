@@ -2,7 +2,7 @@ interface _StatisticsRequest {
   startTime: number;
   endTime: number;
   userId: string;
-  requestId: string;
+  requestId?: string;
 }
 
 interface PopularUrlsRequest extends _StatisticsRequest {
@@ -41,7 +41,7 @@ type GeneratedShortUrlsRequest = {
   userId: string;
   limit: number;
   offset: number;
-  requestId: string;
+  requestId?: string;
 };
 
 interface DashboardRequest extends _StatisticsRequest {
@@ -56,7 +56,7 @@ type UsageRequest = {
   userId: string;
   startTime: number;
   endTime: number;
-  requestId: string;
+  requestId?: string;
 };
 
 export {

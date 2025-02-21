@@ -11,9 +11,23 @@ const logger = getLogger(
 export const getCachedSummaryStatistics = async (
   request: RequestModels.DashboardRequest
 ): Promise<ResponseModel.DashboardResponse | null> => {
+  const { requestId } = request;
+
+  if (logger.isDebugEnabled()) {
+    logger.debug(
+      `Fetching cached summary statistics for userId ${request.userId}`,
+      {
+        requestId,
+      }
+    );
+  }
+
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", {
+      requestId,
+    });
     return null;
   }
 
@@ -27,7 +41,10 @@ export const getCachedSummaryStatistics = async (
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(`Error retrieving cached summary statistics: ${err}`);
+    logger.error(`Error retrieving cached summary statistics`, {
+      err,
+      requestId,
+    });
     return null;
   }
 };
@@ -35,9 +52,23 @@ export const getCachedSummaryStatistics = async (
 export const getCachedGeneratedShortUrls = async (
   request: RequestModels.GeneratedShortUrlsRequest
 ): Promise<ResponseModel.GeneratedShortUrlsResponse | null> => {
+  const { requestId } = request;
+
+  if (logger.isDebugEnabled()) {
+    logger.debug(
+      `Fetching cached generated URLs for userId ${request.userId}`,
+      {
+        requestId,
+      }
+    );
+  }
+
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", {
+      requestId,
+    });
     return null;
   }
 
@@ -51,7 +82,10 @@ export const getCachedGeneratedShortUrls = async (
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(`Error retrieving cached short URLs statistics: ${err}`);
+    logger.error(`Error retrieving cached short URLs statistics`, {
+      err,
+      requestId,
+    });
     return null;
   }
 };
@@ -59,9 +93,20 @@ export const getCachedGeneratedShortUrls = async (
 export const getCachedPopularUrls = async (
   request: RequestModels.PopularUrlsRequest
 ): Promise<ResponseModel.PopularUrlStatisticsResponse | null> => {
+  const { requestId } = request;
+
+  if (logger.isDebugEnabled()) {
+    logger.debug(`Fetching cached popular URLs for userId ${request.userId}`, {
+      requestId,
+    });
+  }
+
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", {
+      requestId,
+    });
     return null;
   }
 
@@ -75,7 +120,10 @@ export const getCachedPopularUrls = async (
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(`Error retrieving cached popular URLs statistics: ${err}`);
+    logger.error(`Error retrieving cached popular URLs statistics`, {
+      err,
+      requestId,
+    });
     return null;
   }
 };
@@ -83,9 +131,23 @@ export const getCachedPopularUrls = async (
 export const getCachedUrlStatistics = async (
   request: RequestModels.UrlMetricsRequest
 ): Promise<ResponseModel.UrlStatisticsResponse | null> => {
+  const { requestId } = request;
+
+  if (logger.isDebugEnabled()) {
+    logger.debug(
+      `Fetching cached URL statistics for userId ${request.userId} and shortUrl ${request.shortUrl}`,
+      {
+        requestId,
+      }
+    );
+  }
+
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", {
+      requestId,
+    });
     return null;
   }
 
@@ -99,7 +161,10 @@ export const getCachedUrlStatistics = async (
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(`Error retrieving cached URL statistics: ${err}`);
+    logger.error(`Error retrieving cached URL statistics`, {
+      requestId,
+      err,
+    });
     return null;
   }
 };
@@ -107,9 +172,23 @@ export const getCachedUrlStatistics = async (
 export const getCachedDeviceMetrics = async (
   request: RequestModels.DeviceMetricsRequest
 ): Promise<ResponseModel.DeviceMetricsResponse | null> => {
+  const { requestId } = request;
+
+  if (logger.isDebugEnabled()) {
+    logger.debug(
+      `Fetching cached device metrics for userId ${request.userId}`,
+      {
+        requestId,
+      }
+    );
+  }
+
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", {
+      requestId,
+    });
     return null;
   }
 
@@ -123,7 +202,10 @@ export const getCachedDeviceMetrics = async (
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(`Error retrieving cached device statistics: ${err}`);
+    logger.error(`Error retrieving cached device statistics`, {
+      err,
+      requestId,
+    });
     return null;
   }
 };
@@ -131,9 +213,23 @@ export const getCachedDeviceMetrics = async (
 export const getCachedGeographyMetrics = async (
   request: RequestModels.GeographicalMetricsRequest
 ): Promise<ResponseModel.GeographicalStatisticsResponse | null> => {
+  const { requestId } = request;
+
+  if (logger.isDebugEnabled()) {
+    logger.debug(
+      `Fetching cached geography metrics for userId ${request.userId}`,
+      {
+        requestId,
+      }
+    );
+  }
+
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", {
+      requestId,
+    });
     return null;
   }
 
@@ -147,7 +243,10 @@ export const getCachedGeographyMetrics = async (
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(`Error retrieving cached geography statistics: ${err}`);
+    logger.error(`Error retrieving cached geography statistics`, {
+      err,
+      requestId,
+    });
     return null;
   }
 };
@@ -156,9 +255,23 @@ export const setCachedSummaryStatistics = async (
   request: RequestModels.DashboardRequest,
   response: ResponseModel.DashboardResponse
 ): Promise<void> => {
+  const { requestId } = request;
+
+  if (logger.isDebugEnabled()) {
+    logger.debug(
+      `Setting cached summary statistics for userId ${request.userId}`,
+      {
+        requestId,
+      }
+    );
+  }
+
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", {
+      requestId,
+    });
     return;
   }
 
@@ -166,7 +279,10 @@ export const setCachedSummaryStatistics = async (
     const key = createSummaryStatsKey(request);
     await instance.set(key, JSON.stringify(response), "PX", getTTLDuration());
   } catch (err: any) {
-    logger.error(`Error caching dashboard summary statistics: ${err}`);
+    logger.error(`Error caching dashboard summary statistics`, {
+      err,
+      requestId,
+    });
   }
 };
 
@@ -174,9 +290,23 @@ export const setCachedGeneratedShortUrls = async (
   request: RequestModels.GeneratedShortUrlsRequest,
   response: ResponseModel.GeneratedShortUrlsResponse
 ): Promise<void> => {
+  const { requestId } = request;
+
+  if (logger.isDebugEnabled()) {
+    logger.debug(
+      `Setting cached generated short URLs for userId ${request.userId}`,
+      {
+        requestId,
+      }
+    );
+  }
+
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", {
+      requestId,
+    });
     return;
   }
 
@@ -184,7 +314,10 @@ export const setCachedGeneratedShortUrls = async (
     const key = createGeneratedShortUrlsKey(request);
     await instance.set(key, JSON.stringify(response), "PX", getTTLDuration());
   } catch (err: any) {
-    logger.error(`Error caching generating short URLs statistics: ${err}`);
+    logger.error(`Error caching generating short URLs statistics`, {
+      err,
+      requestId,
+    });
   }
 };
 
@@ -192,9 +325,19 @@ export const setCachedPopularUrls = async (
   request: RequestModels.PopularUrlsRequest,
   response: ResponseModel.PopularUrlStatisticsResponse
 ): Promise<void> => {
+  const { requestId } = request;
+
+  if (logger.isDebugEnabled()) {
+    logger.debug(`Setting cached popular URLs for userId ${request.userId}`, {
+      requestId,
+    });
+  }
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", {
+      requestId,
+    });
     return;
   }
 
@@ -202,7 +345,7 @@ export const setCachedPopularUrls = async (
     const key = createPopularUrlsKey(request);
     await instance.set(key, JSON.stringify(response), "PX", getTTLDuration());
   } catch (err: any) {
-    logger.error(`Error caching popular URLs statistics: ${err}`);
+    logger.error(`Error caching popular URLs statistics`, { err, requestId });
   }
 };
 
@@ -210,9 +353,19 @@ export const setCachedUrlStatistics = async (
   request: RequestModels.UrlMetricsRequest,
   response: ResponseModel.UrlStatisticsResponse
 ): Promise<void> => {
+  const { requestId } = request;
+
+  if (logger.isDebugEnabled()) {
+    logger.debug(`Setting cached URL statistics for userId ${request.userId}`, {
+      requestId,
+    });
+  }
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", {
+      requestId,
+    });
     return;
   }
 
@@ -220,7 +373,7 @@ export const setCachedUrlStatistics = async (
     const key = createUrlStatisticsKey(request);
     await instance.set(key, JSON.stringify(response), "PX", getTTLDuration());
   } catch (err: any) {
-    logger.error(`Error caching URL statistics: ${err}`);
+    logger.error(`Error caching URL statistics`, { err, requestId });
   }
 };
 
@@ -228,9 +381,19 @@ export const setCachedDeviceMetrics = async (
   request: RequestModels.DeviceMetricsRequest,
   response: ResponseModel.DeviceMetricsResponse
 ): Promise<void> => {
+  const { requestId } = request;
+
+  if (logger.isDebugEnabled()) {
+    logger.debug(`Setting cached device metrics for userId ${request.userId}`, {
+      requestId,
+    });
+  }
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", {
+      requestId,
+    });
     return;
   }
 
@@ -238,7 +401,7 @@ export const setCachedDeviceMetrics = async (
     const key = createDeviceMetricsKey(request);
     await instance.set(key, JSON.stringify(response), "PX", getTTLDuration());
   } catch (err: any) {
-    logger.error(`Error caching device metrics statistics: ${err}`);
+    logger.error(`Error caching device metrics statistics`, { err, requestId });
   }
 };
 
@@ -246,9 +409,23 @@ export const setCachedGeographicMetrics = async (
   request: RequestModels.GeographicalMetricsRequest,
   response: ResponseModel.GeographicalStatisticsResponse
 ): Promise<void> => {
+  const { requestId } = request;
+
+  if (logger.isDebugEnabled()) {
+    logger.debug(
+      `Setting cached geography metrics for userId ${request.userId}`,
+      {
+        requestId,
+      }
+    );
+  }
+
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", {
+      requestId,
+    });
     return;
   }
 
@@ -256,7 +433,10 @@ export const setCachedGeographicMetrics = async (
     const key = createGeographicMetricsKey(request);
     await instance.set(key, JSON.stringify(response), "PX", getTTLDuration());
   } catch (err: any) {
-    logger.error(`Error caching geography metrics statistics: ${err}`);
+    logger.error(`Error caching geography metrics statistics`, {
+      err,
+      requestId,
+    });
   }
 };
 

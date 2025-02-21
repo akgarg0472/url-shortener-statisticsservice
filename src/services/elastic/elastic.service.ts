@@ -23,7 +23,7 @@ export const initElasticClient = async () => {
     elasticClient = client;
   } catch (err: any) {
     if (err instanceof errors.ElasticsearchClientError) {
-      logger.error(`Elasticsearch is down: ${err}`);
+      logger.error(`Elasticsearch is down`, err);
     }
 
     throw new ElasticInitError(
@@ -56,8 +56,8 @@ export const destroyElasticClient = async () => {
   try {
     await elasticClient.close();
     logger.info("Disconnected from ELK");
-  } catch (err) {
-    logger.error(`Error disconnecting ELK: ${err}`);
+  } catch (err: any) {
+    logger.error(`Error disconnecting ELK`, err);
   }
 };
 
@@ -87,7 +87,7 @@ const enableHealthCheck = () => {
       }
     } catch (err: any) {
       if (err instanceof errors.ConnectionError) {
-        logger.error(`Elastic ping failed: ${err.message}`);
+        logger.error(`Elastic ping failed`, err);
       }
     }
   }, healthCheckInterval);
@@ -150,9 +150,9 @@ const _createIndex = (indexName: string) => {
       const error = err.meta?.body?.error?.type;
 
       if (status === 400 && error === "resource_already_exists_exception") {
-        logger.warn(`Elastic index '${indexName}' already exists...`);
+        logger.info(`Elastic index '${indexName}' already exists...`);
       } else {
-        logger.error(err);
+        logger.error("Error creating elastic index", err);
       }
     });
 };

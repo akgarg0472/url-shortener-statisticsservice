@@ -57,7 +57,7 @@ export const initDiscoveryClient = async (isRetry: boolean = false) => {
     initDiscoveryClientQueryLoop();
     initHeartbeat();
   } catch (err: any) {
-    logger.error(`Failed to initialize Discovery client: ${err}`);
+    logger.error(`Failed to initialize Discovery client`, err);
 
     if (retryCount < MAX_RETRIES) {
       retryCount++;
@@ -85,15 +85,13 @@ export const destroyDiscoveryClient = async () => {
   try {
     await discoveryClient.agent.service.deregister(serviceId);
   } catch (err: any) {
-    logger.error(`Failed to stop Discovery client: ${err}`);
+    logger.error(`Failed to stop Discovery client`, err);
   } finally {
     clearRunningIntervals();
   }
 };
 
-export const getServiceEndpoints = async (
-  serviceName: string
-): Promise<ServiceEndpoint[]> => {
+export const getServiceEndpoints = (serviceName: string): ServiceEndpoint[] => {
   return serviceEndpoints.filter(
     (service) => service.serviceName === serviceName
   );
@@ -206,7 +204,7 @@ const sendHeartbeat = async () => {
       note: `Heartbeat from agent`,
     });
   } catch (err: any) {
-    logger.error(`Error sending heartbeat: ${err}`);
+    logger.error(`Error sending heartbeat`, err);
 
     if (err instanceof Error) {
       if (err.message.includes("not found")) {

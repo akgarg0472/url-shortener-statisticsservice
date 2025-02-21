@@ -20,6 +20,12 @@ let timestampFieldExistsInUrlStatistics: boolean = true;
 export const getSummaryStatistics = async (
   request: RequestModels.DashboardRequest
 ): Promise<RM.StatisticsResponse> => {
+  const { requestId, userId } = request;
+
+  logger.info(`Usage statistics request received for userId ${userId}`, {
+    requestId,
+  });
+
   try {
     const cached = await cacheService.getCachedSummaryStatistics(request);
 
@@ -129,7 +135,7 @@ export const getSummaryStatistics = async (
 
     return response;
   } catch (err: any) {
-    logger.error(`Error fetching summary stats: ${err}`);
+    logger.error(`Error fetching summary statistics`, { err, requestId });
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
@@ -144,6 +150,12 @@ export const getSummaryStatistics = async (
 export const getGeneratedShortUrls = async (
   request: RequestModels.GeneratedShortUrlsRequest
 ): Promise<RM.StatisticsResponse> => {
+  const { requestId, userId } = request;
+
+  logger.info(`Received generated short URLs request for userId ${userId}`, {
+    requestId,
+  });
+
   const cached = await cacheService.getCachedGeneratedShortUrls(request);
 
   if (cached) {
@@ -196,7 +208,10 @@ export const getGeneratedShortUrls = async (
     if (isMissingTimestampFieldToSortError(error)) {
       timestampFieldExistsInGeneratedShortUrl = false;
       logger.warn(
-        "No timestamp field found for sorting. Sending fallback response"
+        "No timestamp field found for sorting. Sending fallback response",
+        {
+          requestId,
+        }
       );
       const response: RM.GeneratedShortUrlsResponse = {
         total_records: 0,
@@ -206,7 +221,7 @@ export const getGeneratedShortUrls = async (
       return response;
     }
 
-    logger.error(`Error fetching generated short URLs: ${error}`);
+    logger.error(`Error fetching generated short URLs`, { error, requestId });
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
@@ -221,6 +236,12 @@ export const getGeneratedShortUrls = async (
 export const getPopularUrlsStatistics = async (
   request: RequestModels.PopularUrlsRequest
 ): Promise<RM.StatisticsResponse> => {
+  const { requestId, userId } = request;
+
+  logger.info(`Received popular URL statistics request for userId ${userId}`, {
+    requestId,
+  });
+
   const cached = await cacheService.getCachedPopularUrls(request);
 
   if (cached) {
@@ -267,7 +288,7 @@ export const getPopularUrlsStatistics = async (
 
     return popularUrlResponse;
   } catch (error: any) {
-    logger.error(`Error fetching popular URLs: ${error}`);
+    logger.error(`Error fetching popular URLs`, { error, requestId });
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
@@ -282,9 +303,15 @@ export const getPopularUrlsStatistics = async (
 export const getUrlStatistics = async (
   request: RequestModels.UrlMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
+  const { requestId, shortUrl } = request;
+
+  logger.info(`Received URL statistics request for shortUrl ${shortUrl}`, {
+    requestId,
+  });
+
   const isAllowed: boolean =
     await subscriptionService.isUserAllowedToAccessResource(
-      request.requestId,
+      request.requestId ?? null,
       request.userId,
       "url"
     );
@@ -370,7 +397,8 @@ export const getUrlStatistics = async (
     if (isMissingTimestampFieldToSortError(error)) {
       timestampFieldExistsInUrlStatistics = false;
       logger.warn(
-        "No 'timestamp' field found for sorting in url statistics. Sending fallback response"
+        "No 'timestamp' field found for sorting in url statistics. Sending fallback response",
+        { requestId }
       );
       const response: RM.UrlStatisticsResponse = {
         status_code: 200,
@@ -381,7 +409,7 @@ export const getUrlStatistics = async (
       return response;
     }
 
-    logger.error(`Error fetching URL statistics: ${error}`);
+    logger.error(`Error fetching URL statistics`, { error, requestId });
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
@@ -396,9 +424,15 @@ export const getUrlStatistics = async (
 export const getDeviceMetricsStatistics = async (
   request: RequestModels.DeviceMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
+  const { requestId, userId } = request;
+
+  logger.info(`Received device metrics request for userId ${userId}`, {
+    requestId,
+  });
+
   const isAllowed: boolean =
     await subscriptionService.isUserAllowedToAccessResource(
-      request.requestId,
+      request.requestId ?? null,
       request.userId,
       "device"
     );
@@ -493,7 +527,7 @@ export const getDeviceMetricsStatistics = async (
 
     return response;
   } catch (error: any) {
-    logger.error(`Error fetching device metrics: ${error}`);
+    logger.error(`Error fetching device metrics`, { requestId, error });
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
@@ -508,9 +542,15 @@ export const getDeviceMetricsStatistics = async (
 export const getGeographyMetricsStatistics = async (
   request: RequestModels.GeographicalMetricsRequest
 ): Promise<RM.StatisticsResponse> => {
+  const { requestId, userId } = request;
+
+  logger.info(`Received geography metrics request for userId ${userId}`, {
+    requestId,
+  });
+
   const isAllowed: boolean =
     await subscriptionService.isUserAllowedToAccessResource(
-      request.requestId,
+      request.requestId ?? null,
       request.userId,
       "geography"
     );
@@ -600,7 +640,7 @@ export const getGeographyMetricsStatistics = async (
 
     return response;
   } catch (error: any) {
-    logger.error(`Error fetching geography metrics: ${error}`);
+    logger.error(`Error fetching geography metrics`, { requestId, error });
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
@@ -615,9 +655,11 @@ export const getGeographyMetricsStatistics = async (
 export const getUsageStatistics = async (
   request: RequestModels.UsageRequest
 ): Promise<RM.StatisticsResponse> => {
-  if (logger.isDebugEnabled()) {
-    logger.debug(`Received usage request: ${JSON.stringify(request)}`);
-  }
+  const { requestId, userId } = request;
+
+  logger.info(`Received usage statistics request for userId ${userId}`, {
+    requestId,
+  });
 
   try {
     const elasticCreateIndexName: string =
@@ -656,7 +698,10 @@ export const getUsageStatistics = async (
 
     return response;
   } catch (error: any) {
-    logger.error(`Error fetching usage metrics: ${error}`);
+    logger.error(`Error fetching usage metrics`, {
+      requestId,
+      error,
+    });
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,

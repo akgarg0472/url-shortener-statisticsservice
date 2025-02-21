@@ -1,9 +1,8 @@
 import UAParser from "ua-parser-js";
 import { DeviceInfo } from "../../model/models.events";
 
-const userAgentParser: UAParser = new UAParser();
-
 const getDeviceInfo = (userAgent: string): DeviceInfo => {
+  const userAgentParser: UAParser = new UAParser();
   userAgentParser.setUA(userAgent);
 
   const browserName = userAgentParser.getBrowser().name;

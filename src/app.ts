@@ -1,6 +1,8 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
+import { basename, dirname } from "path";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpecs } from "./configs/swagger.configs";
+import { getLogger } from "./logger/logger";
 import {
   getMetrics,
   increaseRequestCounter,
@@ -9,20 +11,36 @@ import {
 import { PingResponse } from "./model/response.models";
 import discoveryRouterV1 from "./routes/discovery.routes";
 import statisticsRouterV1 from "./routes/statistics.routes.v1";
+import { REQUEST_ID_HEADER } from "./utils/constants";
+
+const logger = getLogger(
+  `${basename(dirname(__filename))}/${basename(__filename)}`
+);
 
 const app: Application = express();
 
 app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-  const start = Date.now();
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const startTime = performance.now();
 
   res.on("finish", () => {
-    const durationInMillis = Date.now() - start;
-    const method = req.method;
-    const path = req.originalUrl.split("?")[0];
-    const statusCode = res.statusCode.toString();
+    const durationInMillis: number = parseFloat(
+      (performance.now() - startTime).toFixed(3)
+    );
+    const method: string = req.method;
+    const path: string = req.originalUrl.split("?")[0];
+    const statusCode: string = res.statusCode.toString();
+    logger.info("", {
+      method: method,
+      url: path,
+      status: statusCode,
+      responseTime: durationInMillis,
+      ip: req.ip,
+      requestId: req.get(REQUEST_ID_HEADER),
+    });
     increaseRequestCounter(method, path, statusCode);
     observeRequestDuration(method, path, statusCode, durationInMillis);
   });
@@ -31,6 +49,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/v1/statistics", statisticsRouterV1);
+
 app.use("/admin", discoveryRouterV1);
 
 app.get("/ping", (req: Request, res: Response) => {

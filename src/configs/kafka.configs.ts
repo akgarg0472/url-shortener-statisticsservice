@@ -27,7 +27,7 @@ const createKafkaConsumer = (
 
   const kafka: Kafka = new Kafka({
     brokers: brokersUrl,
-    clientId: "urlshortener-statistics-service-consumer-client",
+    clientId: "statistics-service-consumer-client",
     retry: {
       maxRetryTime: getEnvNumber("KAFKA_MAX_RETRY_TIME_MS", 60_000),
       initialRetryTime: getEnvNumber("KAFKA_INITIAL_RETRY_TIME_MS", 1_000),
@@ -38,7 +38,7 @@ const createKafkaConsumer = (
   });
 
   const consumerConfig: ConsumerConfig = {
-    groupId: "urlshortener-statistics-service-consumer-group",
+    groupId: "statistics-service-consumer-group",
     allowAutoTopicCreation: true,
   };
 

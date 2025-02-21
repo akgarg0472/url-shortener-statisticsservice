@@ -1,8 +1,6 @@
-import { randomUUID } from "crypto";
 import { NextFunction, Request, Response } from "express";
 import * as RequestModels from "../model/request.models";
-
-const REQUEST_ID_HEADER: string = "X-Request-Id";
+import { REQUEST_ID_HEADER } from "../utils/constants";
 
 const addPopularUrlRequestAttribute = (
   req: Request,
@@ -11,16 +9,17 @@ const addPopularUrlRequestAttribute = (
 ) => {
   const { userId, startTime, endTime, sortOrder, limit } = req.query;
 
-  const popularUrlsRequest: RequestModels.PopularUrlsRequest = {
+  const request: RequestModels.PopularUrlsRequest = {
     userId: userId?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
     sortOrder: sortOrder ? sortOrder.toString() : "asc",
     limit: limit ? parseInt(limit.toString()!) : 10,
-    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
+    requestId: req.get(REQUEST_ID_HEADER),
   };
 
-  (req as any).request = popularUrlsRequest;
+  (req as any).request = request;
+  (req as any).requestId = request.requestId;
 
   next();
 };
@@ -32,15 +31,16 @@ const addDeviceMetricsRequestAttribute = (
 ) => {
   const { shortUrl, userId, startTime, endTime } = req.query;
 
-  const deviceMetricsRequest: RequestModels.DeviceMetricsRequest = {
+  const request: RequestModels.DeviceMetricsRequest = {
     userId: userId?.toString()!,
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
-    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
+    requestId: req.get(REQUEST_ID_HEADER),
   };
 
-  (req as any).request = deviceMetricsRequest;
+  (req as any).request = request;
+  (req as any).requestId = request.requestId;
 
   next();
 };
@@ -52,15 +52,16 @@ const addGeographicalMetricsRequestAttribute = (
 ) => {
   const { userId, shortUrl, startTime, endTime } = req.query;
 
-  const deviceMetricsRequest: RequestModels.GeographicalMetricsRequest = {
+  const request: RequestModels.GeographicalMetricsRequest = {
     userId: userId?.toString()!,
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
-    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
+    requestId: req.get(REQUEST_ID_HEADER),
   };
 
-  (req as any).request = deviceMetricsRequest;
+  (req as any).request = request;
+  (req as any).requestId = request.requestId;
 
   next();
 };
@@ -72,15 +73,16 @@ const addIpRequestRequestAttribute = (
 ) => {
   const { userId, shortUrl, startTime, endTime } = req.query;
 
-  const deviceMetricsRequest: RequestModels.GeographicalMetricsRequest = {
+  const request: RequestModels.GeographicalMetricsRequest = {
     userId: userId?.toString()!,
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
-    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
+    requestId: req.get(REQUEST_ID_HEADER),
   };
 
-  (req as any).request = deviceMetricsRequest;
+  (req as any).request = request;
+  (req as any).requestId = request.requestId;
 
   next();
 };
@@ -92,16 +94,17 @@ const addRedirectStatsRequestAttribute = (
 ) => {
   const { userId, shortUrl, startTime, endTime, eventType } = req.query;
 
-  const redirectStatisticsRequest: RequestModels.RedirectStatisticsRequest = {
+  const request: RequestModels.RedirectStatisticsRequest = {
     userId: userId?.toString()!,
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
     eventType: eventType?.toString()!,
-    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
+    requestId: req.get(REQUEST_ID_HEADER),
   };
 
-  (req as any).request = redirectStatisticsRequest;
+  (req as any).request = request;
+  (req as any).requestId = request.requestId;
 
   next();
 };
@@ -113,16 +116,17 @@ const addRedirectTimeRequestAttribute = (
 ) => {
   const { userId, shortUrl, startTime, endTime, eventType } = req.query;
 
-  const redirectTimeRequest: RequestModels.RedirectTimeRequest = {
+  const request: RequestModels.RedirectTimeRequest = {
     userId: userId?.toString()!,
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
     eventType: eventType?.toString()!,
-    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
+    requestId: req.get(REQUEST_ID_HEADER),
   };
 
-  (req as any).request = redirectTimeRequest;
+  (req as any).request = request;
+  (req as any).requestId = request.requestId;
 
   next();
 };
@@ -136,16 +140,17 @@ const addUrlMetricsRequestAttribute = (
 
   const __limit: number = parseInt(limit?.toString()!);
 
-  const urlMetricsRequest: RequestModels.UrlMetricsRequest = {
+  const request: RequestModels.UrlMetricsRequest = {
     userId: userId?.toString()!,
     shortUrl: shortUrl?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
     limit: __limit <= 10 ? __limit : 10,
-    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
+    requestId: req.get(REQUEST_ID_HEADER),
   };
 
-  (req as any).request = urlMetricsRequest;
+  (req as any).request = request;
+  (req as any).requestId = request.requestId;
 
   next();
 };
@@ -165,7 +170,7 @@ const addSummaryRequestAttribute = (
     timezone,
   } = req.query;
 
-  const dashboardRequest: RequestModels.DashboardRequest = {
+  const request: RequestModels.DashboardRequest = {
     userId: userId?.toString()!,
     startTime: parseInt(startTime?.toString()!),
     endTime: parseInt(endTime?.toString()!),
@@ -173,10 +178,11 @@ const addSummaryRequestAttribute = (
     currentTime: parseInt(currentTime?.toString()!),
     oneWeekOldTime: parseInt(oneWeekOldTime?.toString()!),
     timezone: timezone?.toString(),
-    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
+    requestId: req.get(REQUEST_ID_HEADER),
   };
 
-  (req as any).request = dashboardRequest;
+  (req as any).request = request;
+  (req as any).requestId = request.requestId;
 
   next();
 };
@@ -188,14 +194,15 @@ const addGeneratedShortUrlsRequestAttribute = (
 ) => {
   const { userId, limit, offset } = req.query;
 
-  const generatedShortUrlsRequest: RequestModels.GeneratedShortUrlsRequest = {
+  const request: RequestModels.GeneratedShortUrlsRequest = {
     userId: userId?.toString()!,
     limit: limit ? parseInt(limit.toString()!) : 5,
     offset: offset ? parseInt(offset.toString()!) : 0,
-    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
+    requestId: req.get(REQUEST_ID_HEADER),
   };
 
-  (req as any).request = generatedShortUrlsRequest;
+  (req as any).request = request;
+  (req as any).requestId = request.requestId;
 
   next();
 };
@@ -206,14 +213,17 @@ const addUsageRequestAttributes = (
   next: NextFunction
 ) => {
   const { metricName, userId, startTime, endTime } = req.query;
-  const usageRequest: RequestModels.UsageRequest = {
+  const request: RequestModels.UsageRequest = {
     metricName: metricName!.toString(),
     userId: userId!.toString(),
     startTime: parseInt(startTime!.toString(), 10),
     endTime: parseInt(endTime!.toString(), 10),
-    requestId: req.get(REQUEST_ID_HEADER) ?? randomUUID(),
+    requestId: req.get(REQUEST_ID_HEADER),
   };
-  (req as any).request = usageRequest;
+
+  (req as any).request = request;
+  (req as any).requestId = request.requestId;
+
   next();
 };
 

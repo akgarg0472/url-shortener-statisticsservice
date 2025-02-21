@@ -20,7 +20,7 @@ const initGeoLocation = () => {
   geoLocationDatabaseReader = Reader.openBuffer(databaseBuffer);
 };
 
-const getGeoLocation = (ip: string): GeoLocationInfo => {
+const getGeoLocation = (requestId: string, ip: string): GeoLocationInfo => {
   try {
     const city: City = geoLocationDatabaseReader.city(ip);
 
@@ -36,30 +36,33 @@ const getGeoLocation = (ip: string): GeoLocationInfo => {
     return location;
   } catch (error: any) {
     if (!(error instanceof AddressNotFoundError)) {
-      logger.error(`Error fetching geolocation for ip=${ip}: ${error}`);
+      logger.error(`Error fetching geolocation for ip=${ip}`, {
+        requestId,
+        error,
+      });
     }
 
     return {
-      city: "unidentified",
-      country: "unidentified",
-      continent: "unidentified",
+      city: "unknown",
+      country: "unknown",
+      continent: "unknown",
       lat: 0.0,
       lon: 0.0,
-      timezone: "unidentified",
+      timezone: "unknown",
     };
   }
 };
 
 const extractContinent = (city: City): string => {
-  return city.continent?.names?.en || "unidentified";
+  return city.continent?.names?.en || "unknown";
 };
 
 const extractCountry = (city: City): string => {
-  return city.country?.names?.en || "unidentified";
+  return city.country?.names?.en || "unknown";
 };
 
 const extractCity = (city: City): string => {
-  return city.city?.names?.en || "unidentified";
+  return city.city?.names?.en || "unknown";
 };
 
 const extractLat = (city: City): number => {
@@ -71,7 +74,7 @@ const extractLon = (city: City): number => {
 };
 
 const extractTimezone = (city: City): string => {
-  return city.location?.timeZone || "unidentified";
+  return city.location?.timeZone || "unknown";
 };
 
 export { getGeoLocation, initGeoLocation };

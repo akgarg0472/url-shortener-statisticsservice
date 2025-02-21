@@ -19,13 +19,16 @@ const logger = getLogger(
 );
 
 export const isUserAllowedToAccessResource = async (
-  requestId: string,
+  requestId: string | null,
   userId: string,
   resourceType: "device" | "geography" | "url"
 ): Promise<boolean> => {
   if (logger.isDebugEnabled()) {
     logger.debug(
-      `[${requestId}] Checking if user ${userId} is allowed to access ${resourceType} metrics`
+      `Checking if user ${userId} is allowed to access ${resourceType} metrics`,
+      {
+        requestId,
+      }
     );
   }
 
@@ -33,9 +36,9 @@ export const isUserAllowedToAccessResource = async (
     await fetchSubscriptionDetailsForUser(requestId, userId);
 
   if (!subscriptionDetails) {
-    if (logger.isInfoEnabled()) {
-      logger.info(`[${requestId}] No subscription details found`);
-    }
+    logger.info(`No subscription details found for userId ${userId}`, {
+      requestId,
+    });
     return false;
   }
 
@@ -69,7 +72,7 @@ export const isUserAllowedToAccessResource = async (
 };
 
 const fetchSubscriptionDetailsForUser = async (
-  requestId: string,
+  requestId: string | null,
   userId: string
 ): Promise<SubscriptionDetails | null> => {
   let subscription = await cacheService.getSubscription(requestId, userId);
@@ -83,6 +86,15 @@ const fetchSubscriptionDetailsForUser = async (
     userId
   );
 
+  if (logger.isDebugEnabled()) {
+    logger.debug(
+      `Subscription details fetched: ${
+        subscription ? JSON.stringify(subscription) : null
+      }`,
+      { requestId: requestId }
+    );
+  }
+
   if (subscription) {
     cacheService.addSubscription(requestId, userId, subscription);
   }
@@ -91,7 +103,7 @@ const fetchSubscriptionDetailsForUser = async (
 };
 
 const fetchSubscriptionDetailsFromSubscriptionService = async (
-  requestId: string,
+  requestId: string | null,
   userId: string
 ): Promise<SubscriptionDetails | null> => {
   const subsServiceName: string =
@@ -101,7 +113,7 @@ const fetchSubscriptionDetailsFromSubscriptionService = async (
     process.env["SUBSCRIPTION_SERVICE_ACTIVE_BASE_PATH"] ??
     "/api/v1/subscriptions/active";
 
-  const endpoints = await getServiceEndpoints(subsServiceName);
+  const endpoints = getServiceEndpoints(subsServiceName);
 
   for (let i = 0; i < endpoints.length; i++) {
     const { scheme, ip, port } = endpoints[i];
@@ -110,17 +122,23 @@ const fetchSubscriptionDetailsFromSubscriptionService = async (
       activeSubsPath.startsWith("/") ? activeSubsPath : "/" + activeSubsPath
     }?userId=${userId}`;
 
-    if (logger.isInfoEnabled()) {
-      logger.info(`${requestId} Subscription details endpoint: ${url}`);
+    if (logger.isDebugEnabled()) {
+      logger.debug(`Subscription details endpoint: ${url}`, { requestId });
     }
 
     try {
       const response = await axios.get(url, {
         headers: {
-          "X-Request-ID": requestId,
+          "X-Request-Id": requestId,
           "X-User-ID": userId,
         },
       });
+
+      if (logger.isDebugEnabled()) {
+        logger.debug(`Subscription service response code: ${response.status}`, {
+          requestId,
+        });
+      }
 
       if (
         response.status === 200 &&
@@ -140,9 +158,7 @@ const fetchSubscriptionDetailsFromSubscriptionService = async (
         return r;
       }
     } catch (err: any) {
-      logger.error(
-        `[${requestId}] Error fetching subscription details: ${err}`
-      );
+      logger.error(`Error fetching subscription details`, { requestId, err });
     }
   }
 

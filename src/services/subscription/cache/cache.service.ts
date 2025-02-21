@@ -8,12 +8,17 @@ const logger = getLogger(
 );
 
 export const getSubscription = async (
-  requestId: string,
+  requestId: string | null,
   userId: string
 ): Promise<SubscriptionDetails | null> => {
+  if (logger.isDebugEnabled()) {
+    logger.debug(`Fetching subscription details for userId ${userId}`);
+  }
+
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", { requestId });
     return null;
   }
 
@@ -21,27 +26,45 @@ export const getSubscription = async (
     const key: string = createSubscriptionRedisKey(userId);
     const value: string | null = await instance.get(key);
 
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+        `Cached subscription details: ${value ? JSON.stringify(value) : null}`,
+        { requestId }
+      );
+    }
+
     if (!value) {
       return null;
     }
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(
-      `[${requestId}] Error retrieving cached short URLs statistics: ${err}`
-    );
+    logger.error(`Error retrieving cached subscription details`, {
+      requestId,
+      err,
+    });
     return null;
   }
 };
 
 export const addSubscription = async (
-  requestId: string,
+  requestId: string | null,
   userId: string,
   subscription: SubscriptionDetails
 ): Promise<void> => {
+  if (logger.isDebugEnabled()) {
+    logger.debug(`Adding subscription details for userId ${userId}`, {
+      requestId,
+    });
+    logger.debug(`Subscription details: ${JSON.stringify(subscription)}`, {
+      requestId,
+    });
+  }
+
   const instance = getRedisInstance();
 
   if (!instance) {
+    logger.error("Redis instance is not initialized", { requestId });
     return;
   }
 
@@ -54,9 +77,10 @@ export const addSubscription = async (
       getTTLDuration()
     );
   } catch (err: any) {
-    logger.error(
-      `[${requestId}] Error retrieving cached short URLs statistics: ${err}`
-    );
+    logger.error(`Error adding subscription`, {
+      requestId,
+      err,
+    });
   }
 };
 

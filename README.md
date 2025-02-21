@@ -2,7 +2,7 @@
 
 ![Node.js Version](https://img.shields.io/badge/Node.js-20-green)
 ![TypeScript Version](https://img.shields.io/badge/TypeScript-5.1.6-blue)
-![Version](https://img.shields.io/badge/version-2.4.1-white)
+![Version](https://img.shields.io/badge/version-2.5.0-white)
 
 ## Table of Contents
 
@@ -92,10 +92,48 @@ REDIS_TTL_DURATION_MS=60000
 #### General Configuration
 
 - **NODE_ENV**: Specifies the environment (e.g., `DEV`, `PROD`).
-- **LOG_LEVEL**: Logging level (e.g., `info`, `debug`, `warn`).
-- **LOGS_BASE_DIR**: Base directory for log files.
-- **LOG_FILE_NAME**: Log file name.
 - **SERVER_PORT**: Port on which the service runs.
+
+#### Logging Configuration
+
+The URL Shortener Payment Service uses environment variables for logging configuration. Below are the available environment
+variables that you can customize:
+
+- **LOGGING_CONSOLE_ENABLED**: Enables or disables console-based logging.
+
+  - Default value: `false`
+  - Allowed values: `true`, `false`
+
+- **LOGGING_FILE_ENABLED**: Enables or disables file-based logging.
+
+  - Default value: `false`
+  - Allowed values: `true`, `false`
+
+- **LOGGING_FILE_BASE_PATH**: Specifies the base path for log files.
+
+  - Default value: `/tmp`
+
+- **LOGGING_LEVEL**: Specifies the log level for the application.
+
+  - Default value: `INFO`
+  - Allowed values: `DEBUG`, `INFO`, `WARN`, `ERROR`
+
+- **LOGGING_STREAM_ENABLED**: Enables or disables streaming logs.
+
+  - Default value: `false`
+  - Allowed values: `true`, `false`
+
+- **LOGGING_STREAM_HOST**: Specifies the host for streaming logs.
+
+  - Default value: `localhost`
+
+- **LOGGING_STREAM_PORT**: Specifies the port for streaming logs.
+
+  - Default value: `5000`
+
+- **LOGGING_STREAM_PROTOCOL**: Specifies the protocol used for log streaming.
+  - Default value: `TCP`
+  - Allowed values: `TCP`, `UDP`
 
 #### Elasticsearch Configuration
 
