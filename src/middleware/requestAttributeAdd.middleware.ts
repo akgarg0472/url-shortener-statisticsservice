@@ -4,7 +4,7 @@ import { REQUEST_ID_HEADER } from "../utils/constants";
 
 const addPopularUrlRequestAttribute = (
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ) => {
   const { userId, startTime, endTime, sortOrder, limit } = req.query;
@@ -26,7 +26,7 @@ const addPopularUrlRequestAttribute = (
 
 const addDeviceMetricsRequestAttribute = (
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ) => {
   const { shortUrl, userId, startTime, endTime } = req.query;
@@ -47,7 +47,7 @@ const addDeviceMetricsRequestAttribute = (
 
 const addGeographicalMetricsRequestAttribute = (
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ) => {
   const { userId, shortUrl, startTime, endTime } = req.query;
@@ -68,7 +68,7 @@ const addGeographicalMetricsRequestAttribute = (
 
 const addIpRequestRequestAttribute = (
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ) => {
   const { userId, shortUrl, startTime, endTime } = req.query;
@@ -89,7 +89,7 @@ const addIpRequestRequestAttribute = (
 
 const addRedirectStatsRequestAttribute = (
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ) => {
   const { userId, shortUrl, startTime, endTime, eventType } = req.query;
@@ -111,7 +111,7 @@ const addRedirectStatsRequestAttribute = (
 
 const addRedirectTimeRequestAttribute = (
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ) => {
   const { userId, shortUrl, startTime, endTime, eventType } = req.query;
@@ -133,7 +133,7 @@ const addRedirectTimeRequestAttribute = (
 
 const addUrlMetricsRequestAttribute = (
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ) => {
   const { userId, shortUrl, startTime, endTime, limit } = req.query;
@@ -157,7 +157,7 @@ const addUrlMetricsRequestAttribute = (
 
 const addSummaryRequestAttribute = (
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ) => {
   const {
@@ -189,7 +189,7 @@ const addSummaryRequestAttribute = (
 
 const addGeneratedShortUrlsRequestAttribute = (
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ) => {
   const { userId, limit, offset } = req.query;
@@ -209,7 +209,7 @@ const addGeneratedShortUrlsRequestAttribute = (
 
 const addUsageRequestAttributes = (
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ) => {
   const { metricName, userId, startTime, endTime } = req.query;

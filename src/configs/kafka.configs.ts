@@ -85,7 +85,7 @@ const disconnectKafkaConsumer = async () => {
     await kafkaConsumer.stop();
     await kafkaConsumer.disconnect();
   } catch (err) {
-    logger.error(`Error while disconnecting from kafka: ${err}`);
+    logger.error(`Error disconnecting from kafka`, { error: err });
   }
 };
 

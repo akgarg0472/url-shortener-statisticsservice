@@ -16,9 +16,7 @@ export const getCachedSummaryStatistics = async (
   if (logger.isDebugEnabled()) {
     logger.debug(
       `Fetching cached summary statistics for userId ${request.userId}`,
-      {
-        requestId,
-      }
+      { requestId }
     );
   }
 
@@ -41,8 +39,8 @@ export const getCachedSummaryStatistics = async (
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(`Error retrieving cached summary statistics`, {
-      err,
+    logger.error(`Error retrieving cached summary statistics:`, {
+      error: err,
       requestId,
     });
     return null;
@@ -82,8 +80,8 @@ export const getCachedGeneratedShortUrls = async (
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(`Error retrieving cached short URLs statistics`, {
-      err,
+    logger.error(`Error retrieving cached short URLs statistics:`, {
+      error: err,
       requestId,
     });
     return null;
@@ -120,8 +118,8 @@ export const getCachedPopularUrls = async (
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(`Error retrieving cached popular URLs statistics`, {
-      err,
+    logger.error(`Error retrieving cached popular URLs statistics:`, {
+      error: err,
       requestId,
     });
     return null;
@@ -161,9 +159,9 @@ export const getCachedUrlStatistics = async (
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(`Error retrieving cached URL statistics`, {
+    logger.error(`Error retrieving cached URL statistics:`, {
       requestId,
-      err,
+      error: err,
     });
     return null;
   }
@@ -202,8 +200,8 @@ export const getCachedDeviceMetrics = async (
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(`Error retrieving cached device statistics`, {
-      err,
+    logger.error(`Error retrieving cached device statistics:`, {
+      error: err,
       requestId,
     });
     return null;
@@ -243,8 +241,8 @@ export const getCachedGeographyMetrics = async (
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(`Error retrieving cached geography statistics`, {
-      err,
+    logger.error(`Error retrieving cached geography statistics:`, {
+      error: err,
       requestId,
     });
     return null;
@@ -279,8 +277,8 @@ export const setCachedSummaryStatistics = async (
     const key = createSummaryStatsKey(request);
     await instance.set(key, JSON.stringify(response), "PX", getTTLDuration());
   } catch (err: any) {
-    logger.error(`Error caching dashboard summary statistics`, {
-      err,
+    logger.error(`Error caching dashboard summary statistics:`, {
+      error: err,
       requestId,
     });
   }
@@ -314,8 +312,8 @@ export const setCachedGeneratedShortUrls = async (
     const key = createGeneratedShortUrlsKey(request);
     await instance.set(key, JSON.stringify(response), "PX", getTTLDuration());
   } catch (err: any) {
-    logger.error(`Error caching generating short URLs statistics`, {
-      err,
+    logger.error(`Error caching generating short URLs statistics:`, {
+      error: err,
       requestId,
     });
   }
@@ -345,7 +343,10 @@ export const setCachedPopularUrls = async (
     const key = createPopularUrlsKey(request);
     await instance.set(key, JSON.stringify(response), "PX", getTTLDuration());
   } catch (err: any) {
-    logger.error(`Error caching popular URLs statistics`, { err, requestId });
+    logger.error(`Error caching popular URLs statistics:`, {
+      error: err,
+      requestId,
+    });
   }
 };
 
@@ -373,7 +374,7 @@ export const setCachedUrlStatistics = async (
     const key = createUrlStatisticsKey(request);
     await instance.set(key, JSON.stringify(response), "PX", getTTLDuration());
   } catch (err: any) {
-    logger.error(`Error caching URL statistics`, { err, requestId });
+    logger.error(`Error caching URL statistics:`, { error: err, requestId });
   }
 };
 
@@ -401,7 +402,10 @@ export const setCachedDeviceMetrics = async (
     const key = createDeviceMetricsKey(request);
     await instance.set(key, JSON.stringify(response), "PX", getTTLDuration());
   } catch (err: any) {
-    logger.error(`Error caching device metrics statistics`, { err, requestId });
+    logger.error(`Error caching device metrics statistics:`, {
+      error: err,
+      requestId,
+    });
   }
 };
 
@@ -433,8 +437,8 @@ export const setCachedGeographicMetrics = async (
     const key = createGeographicMetricsKey(request);
     await instance.set(key, JSON.stringify(response), "PX", getTTLDuration());
   } catch (err: any) {
-    logger.error(`Error caching geography metrics statistics`, {
-      err,
+    logger.error(`Error caching geography metrics statistics:`, {
+      error: err,
       requestId,
     });
   }

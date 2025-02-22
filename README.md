@@ -2,7 +2,7 @@
 
 ![Node.js Version](https://img.shields.io/badge/Node.js-20-green)
 ![TypeScript Version](https://img.shields.io/badge/TypeScript-5.1.6-blue)
-![Version](https://img.shields.io/badge/version-2.5.1-white)
+![Version](https://img.shields.io/badge/version-2.5.2-white)
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@
 
 ## Introduction
 
-The **URL Shortener Metrics Service** is a Node.js and TypeScript-based microservice designed to handle statistics and metrics for a URL shortener application. It interacts with **Elasticsearch** to store and query metrics data and provides REST endpoints for easy integration.
+The **URL Shortener Statistics Service** is a Node.js and TypeScript-based microservice designed to handle statistics and metrics for a URL shortener application. It interacts with **Elasticsearch** to store and query metrics data and provides REST endpoints for easy integration.
 
 Key features include:
 

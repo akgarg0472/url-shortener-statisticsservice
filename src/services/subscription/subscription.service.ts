@@ -158,7 +158,10 @@ const fetchSubscriptionDetailsFromSubscriptionService = async (
         return r;
       }
     } catch (err: any) {
-      logger.error(`Error fetching subscription details`, { requestId, err });
+      logger.error(`Error fetching subscription details:`, {
+        requestId,
+        error: err,
+      });
     }
   }
 

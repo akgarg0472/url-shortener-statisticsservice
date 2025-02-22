@@ -1,6 +1,7 @@
 import net from "net";
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
+import { StreamTransportInstance } from "winston/lib/winston/transports";
 import { ServerInfo } from "../serverInfo";
 
 // --- Environment-Based Configuration ---
@@ -48,21 +49,6 @@ if (enableFileLogging) {
   transports.push(fileTransport);
 }
 
-if (enableStreamingLogs) {
-  const socket: net.Socket = net.connect(
-    Number(loggingStreamPort),
-    loggingStreamHost
-  );
-  socket.on("error", (err: Error) => {
-    console.error(`TCP Logging error:`, err);
-  });
-  transports.push(
-    new winston.transports.Stream({
-      stream: socket,
-    })
-  );
-}
-
 if (transports.length === 0) {
   transports.push(new winston.transports.Console());
 }
@@ -73,6 +59,14 @@ const rootLogger = winston.createLogger({
     service: serviceName,
   },
   format: winston.format.combine(
+    winston.format((info: winston.Logform.TransformableInfo) => {
+      if (info.error instanceof Error) {
+        info.stack = info.error.stack;
+        info.message = `${info.message} ${info.error.message}`;
+        info.error = undefined;
+      }
+      return info;
+    })(),
     winston.format.errors({
       stack: true,
     }),
@@ -86,6 +80,37 @@ const rootLogger = winston.createLogger({
   ),
   transports: transports,
 });
+
+if (enableStreamingLogs) {
+  const RETRY_INTERVAL = 1000;
+  let streamingTransport: StreamTransportInstance;
+
+  const connectStreaming = (): void => {
+    const socket: net.Socket = net.connect(
+      Number(loggingStreamPort),
+      loggingStreamHost
+    );
+
+    socket.on("error", (err: Error) => {
+      rootLogger.error(`Stream Logging error:`, err);
+    });
+
+    socket.on("close", () => {
+      setTimeout(() => {
+        rootLogger.remove(streamingTransport);
+        connectStreaming();
+      }, RETRY_INTERVAL);
+    });
+
+    streamingTransport = new winston.transports.Stream({
+      stream: socket,
+    });
+
+    rootLogger.add(streamingTransport);
+  };
+
+  connectStreaming();
+}
 
 /**
  * Retrieves a logger instance for the specified file.

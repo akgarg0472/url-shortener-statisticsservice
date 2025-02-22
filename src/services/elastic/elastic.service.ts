@@ -23,9 +23,8 @@ export const initElasticClient = async () => {
     elasticClient = client;
   } catch (err: any) {
     if (err instanceof errors.ElasticsearchClientError) {
-      logger.error(`Elasticsearch is down`, err);
+      logger.error(`Failed to ping elastic search:`, err);
     }
-
     throw new ElasticInitError(
       "Failed to initialize ElasticSearch client",
       err
@@ -47,7 +46,7 @@ export const initElasticClient = async () => {
 
 export const destroyElasticClient = async () => {
   if (!elasticClient) {
-    logger.warn(
+    logger.info(
       "Not destroying elastic instance because it is not initialized!!"
     );
     return;
@@ -57,7 +56,7 @@ export const destroyElasticClient = async () => {
     await elasticClient.close();
     logger.info("Disconnected from ELK");
   } catch (err: any) {
-    logger.error(`Error disconnecting ELK`, err);
+    logger.error(`Error disconnecting ELK:`, err);
   }
 };
 
@@ -68,8 +67,8 @@ const enableHealthCheck = () => {
   );
 
   if (isNaN(healthCheckInterval) || healthCheckInterval <= 0) {
-    logger.warn(
-      "Invalid or missing 'ELASTIC_PING_CHECK_INTERVAL_MS', using default value of 30,000 ms."
+    logger.info(
+      "Invalid or missing 'ELASTIC_PING_CHECK_INTERVAL_MS', using default value of 30000 ms."
     );
     healthCheckInterval = 30_000;
   }
@@ -86,9 +85,7 @@ const enableHealthCheck = () => {
         logger.debug("Elastic ping successful");
       }
     } catch (err: any) {
-      if (err instanceof errors.ConnectionError) {
-        logger.error(`Elastic ping failed`, err);
-      }
+      logger.error(`Elastic ping failed:`, err);
     }
   }, healthCheckInterval);
 };
@@ -152,7 +149,7 @@ const _createIndex = (indexName: string) => {
       if (status === 400 && error === "resource_already_exists_exception") {
         logger.info(`Elastic index '${indexName}' already exists...`);
       } else {
-        logger.error("Error creating elastic index", err);
+        logger.error("Error creating elastic index:", err);
       }
     });
 };

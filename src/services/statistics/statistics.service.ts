@@ -135,7 +135,10 @@ export const getSummaryStatistics = async (
 
     return response;
   } catch (err: any) {
-    logger.error(`Error fetching summary statistics`, { err, requestId });
+    logger.error(`Error fetching summary statistics:`, {
+      error: err,
+      requestId,
+    });
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
@@ -204,8 +207,8 @@ export const getGeneratedShortUrls = async (
     await cacheService.setCachedGeneratedShortUrls(request, response);
 
     return response;
-  } catch (error: any) {
-    if (isMissingTimestampFieldToSortError(error)) {
+  } catch (err: any) {
+    if (isMissingTimestampFieldToSortError(err)) {
       timestampFieldExistsInGeneratedShortUrl = false;
       logger.warn(
         "No timestamp field found for sorting. Sending fallback response",
@@ -221,7 +224,10 @@ export const getGeneratedShortUrls = async (
       return response;
     }
 
-    logger.error(`Error fetching generated short URLs`, { error, requestId });
+    logger.error(`Error fetching generated short URLs:`, {
+      error: err,
+      requestId,
+    });
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
@@ -287,8 +293,8 @@ export const getPopularUrlsStatistics = async (
     await cacheService.setCachedPopularUrls(request, popularUrlResponse);
 
     return popularUrlResponse;
-  } catch (error: any) {
-    logger.error(`Error fetching popular URLs`, { error, requestId });
+  } catch (err: any) {
+    logger.error(`Error fetching popular URLs:`, { error: err, requestId });
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
@@ -393,8 +399,8 @@ export const getUrlStatistics = async (
     await cacheService.setCachedUrlStatistics(request, response);
 
     return response;
-  } catch (error: any) {
-    if (isMissingTimestampFieldToSortError(error)) {
+  } catch (err: any) {
+    if (isMissingTimestampFieldToSortError(err)) {
       timestampFieldExistsInUrlStatistics = false;
       logger.warn(
         "No 'timestamp' field found for sorting in url statistics. Sending fallback response",
@@ -409,7 +415,7 @@ export const getUrlStatistics = async (
       return response;
     }
 
-    logger.error(`Error fetching URL statistics`, { error, requestId });
+    logger.error(`Error fetching URL statistics:`, { error: err, requestId });
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
@@ -526,8 +532,8 @@ export const getDeviceMetricsStatistics = async (
     await cacheService.setCachedDeviceMetrics(request, response);
 
     return response;
-  } catch (error: any) {
-    logger.error(`Error fetching device metrics`, { requestId, error });
+  } catch (err: any) {
+    logger.error(`Error fetching device metrics:`, { requestId, error: err });
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
@@ -639,8 +645,11 @@ export const getGeographyMetricsStatistics = async (
     await cacheService.setCachedGeographicMetrics(request, response);
 
     return response;
-  } catch (error: any) {
-    logger.error(`Error fetching geography metrics`, { requestId, error });
+  } catch (err: any) {
+    logger.error(`Error fetching geography metrics:`, {
+      requestId,
+      error: err,
+    });
 
     const errorResponse: RM.ErrorResponse = {
       status_code: 500,
@@ -697,10 +706,10 @@ export const getUsageStatistics = async (
     };
 
     return response;
-  } catch (error: any) {
-    logger.error(`Error fetching usage metrics`, {
+  } catch (err: any) {
+    logger.error(`Error fetching usage metrics:`, {
       requestId,
-      error,
+      error: err,
     });
 
     const errorResponse: RM.ErrorResponse = {

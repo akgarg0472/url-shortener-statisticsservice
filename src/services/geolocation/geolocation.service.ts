@@ -34,11 +34,11 @@ const getGeoLocation = (requestId: string, ip: string): GeoLocationInfo => {
     };
 
     return location;
-  } catch (error: any) {
-    if (!(error instanceof AddressNotFoundError)) {
-      logger.error(`Error fetching geolocation for ip=${ip}`, {
+  } catch (err: any) {
+    if (!(err instanceof AddressNotFoundError)) {
+      logger.error(`Error fetching geolocation for ${ip}`, {
         requestId,
-        error,
+        error: err,
       });
     }
 

@@ -33,7 +33,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     const method: string = req.method;
     const path: string = req.originalUrl.split("?")[0];
     const statusCode: string = res.statusCode.toString();
-    logger.info("", {
+    logger.info("HTTP request", {
       method: method,
       url: path,
       status: statusCode,
@@ -83,7 +83,8 @@ app.get("/prometheus/metrics", async (req: Request, res: Response) => {
     const metrics = await getMetrics();
     res.set("Content-Type", "text/plain");
     res.send(metrics);
-  } catch (error) {
+  } catch (err: any) {
+    logger.error("Error fetching metrics:", err);
     res.status(500).send("Error fetching metrics");
   }
 });

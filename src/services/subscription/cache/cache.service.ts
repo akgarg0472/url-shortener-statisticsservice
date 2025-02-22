@@ -12,7 +12,9 @@ export const getSubscription = async (
   userId: string
 ): Promise<SubscriptionDetails | null> => {
   if (logger.isDebugEnabled()) {
-    logger.debug(`Fetching subscription details for userId ${userId}`);
+    logger.debug(`Fetching subscription details for userId ${userId}`, {
+      requestId,
+    });
   }
 
   const instance = getRedisInstance();
@@ -39,9 +41,9 @@ export const getSubscription = async (
 
     return JSON.parse(value);
   } catch (err: any) {
-    logger.error(`Error retrieving cached subscription details`, {
+    logger.error(`Error retrieving cached subscription details:`, {
       requestId,
-      err,
+      error: err,
     });
     return null;
   }
@@ -77,9 +79,9 @@ export const addSubscription = async (
       getTTLDuration()
     );
   } catch (err: any) {
-    logger.error(`Error adding subscription`, {
+    logger.error(`Error adding subscription in cache:`, {
       requestId,
-      err,
+      error: err,
     });
   }
 };

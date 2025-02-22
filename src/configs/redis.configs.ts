@@ -25,7 +25,7 @@ const initRedisClient = () => {
   });
 
   redis.on("error", (err: Error) => {
-    logger.error(`Error in redis: ${JSON.stringify(err)}`);
+    logger.error(`Error in redis`, { error: err });
   });
 
   redis.on("ready", () => {
@@ -41,7 +41,7 @@ const disconnectRedisClient = async () => {
   try {
     await redis.quit();
   } catch (err: any) {
-    logger.error("Error disconnecting redis");
+    logger.error("Error disconnecting redis", { error: err });
   }
 };
 

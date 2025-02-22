@@ -69,7 +69,7 @@ export const doCleanupAndShutdown = async (exitCode: number) => {
     await disconnectRedisClient();
     await new Promise((resolve) => setTimeout(resolve, 5000));
   } catch (err: any) {
-    logger.error(`Error cleaning up resources: ${err}`);
+    logger.error(`Error cleaning up resources:`, err);
   } finally {
     logger.info(`Terminating process with exit code: ${exitCode}`);
     process.exit(exitCode);
@@ -79,19 +79,19 @@ export const doCleanupAndShutdown = async (exitCode: number) => {
 process.on(
   "uncaughtException",
   (err: Error, _: NodeJS.UncaughtExceptionOrigin) => {
-    logger.error(`Uncaught exception: ${JSON.stringify(err)}`);
+    logger.error(`Uncaught exception:`, err);
   }
 );
 
 process.on("unhandledRejection", async (reason: any, _: Promise<unknown>) => {
   if (reason instanceof ElasticInitError) {
-    logger.warn("Terminating application because elastic search is down");
+    logger.error("Terminating application due to Elastic error:", reason);
     await doCleanupAndShutdown(-1);
     return;
   }
 
   if (reason instanceof KafkaJSProtocolError) {
-    logger.warn(`Terminating application due to kafka error: ${reason}`);
+    logger.warn(`Terminating application due to Kafka error:`, reason);
     await doCleanupAndShutdown(-1);
     return;
   }
