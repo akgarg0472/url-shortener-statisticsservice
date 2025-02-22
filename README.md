@@ -96,7 +96,7 @@ REDIS_TTL_DURATION_MS=60000
 
 #### Logging Configuration
 
-The URL Shortener Payment Service uses environment variables for logging configuration. Below are the available environment
+The URL Shortener statistics Service uses environment variables for logging configuration. Below are the available environment
 variables that you can customize:
 
 - **LOGGING_CONSOLE_ENABLED**: Enables or disables console-based logging.
