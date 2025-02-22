@@ -3,9 +3,9 @@ import { RegisterOptions } from "consul/lib/agent/service";
 import { randomUUID } from "crypto";
 import { basename, dirname } from "path";
 import { getLogger } from "../logger/logger";
+import { ServerInfo } from "../serverInfo";
 import { doCleanupAndShutdown } from "../statisticsService";
 import { getEnvNumber } from "../utils/envUtils";
-import { getLocalIPAddress } from "../utils/networkUtils";
 import { ServiceEndpoint } from "./endpoint";
 
 const logger = getLogger(
@@ -41,8 +41,8 @@ export const initDiscoveryClient = async (isRetry: boolean = false) => {
   const consulRegisterOptions: RegisterOptions = {
     id: serviceId,
     name: serviceName,
-    address: getLocalIPAddress(),
-    port: getApplicationPort(),
+    address: ServerInfo.ip,
+    port: ServerInfo.port,
     check: {
       name: `health-check`,
       timeout: "5s",
@@ -159,11 +159,6 @@ const createDiscoveryClient = (): Consul => {
     )}`
   );
   return new Consul(consulOptions);
-};
-
-const getApplicationPort = (): number => {
-  const port = process.env["SERVER_PORT"] || "7979";
-  return parseInt(port);
 };
 
 const getDiscoveryServerPort = (): number => {
