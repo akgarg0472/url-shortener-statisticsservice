@@ -2,7 +2,7 @@
 
 ![Node.js Version](https://img.shields.io/badge/Node.js-20-green)
 ![TypeScript Version](https://img.shields.io/badge/TypeScript-5.1.6-blue)
-![Version](https://img.shields.io/badge/version-2.5.2-white)
+![Version](https://img.shields.io/badge/version-2.5.3-white)
 
 ## Table of Contents
 
@@ -59,9 +59,6 @@ Here is an example `.env` file:
 
 ```env
 NODE_ENV=DEV
-LOG_LEVEL=info
-LOGS_BASE_DIR=/tmp/statistics-service/
-LOG_FILE_NAME=statistics.logs
 SERVER_PORT=3000
 KAFKA_TOPIC_NAME=urlshortener.statistics.events
 KAFKA_MAX_RETRY_TIME_MS=60000
@@ -113,7 +110,7 @@ variables that you can customize:
 
   - Default value: `/tmp`
 
-- **LOGGING_LEVEL**: Specifies the log level for the application.
+- **LOG_LEVEL**: Specifies the log level for the application.
 
   - Default value: `INFO`
   - Allowed values: `DEBUG`, `INFO`, `WARN`, `ERROR`
